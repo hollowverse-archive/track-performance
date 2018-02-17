@@ -4,7 +4,6 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 const shelljs = require('shelljs');
 const decryptSecrets = require('@hollowverse/common/helpers/decryptSecrets');
-const executeCommand = require('@hollowverse/common/helpers/executeCommand');
 const executeCommands = require('@hollowverse/common/helpers/executeCommands');
 const createZipFile = require('@hollowverse/common/helpers/createZipFile');
 
@@ -19,7 +18,7 @@ const secrets = [
   },
 ];
 
-const ebEnvironmentName = `${PROJECT}-${BRANCH}`;
+const functionName = `${PROJECT}-${BRANCH}`;
 
 async function main() {
   const buildCommands = ['yarn test', 'yarn build'];
@@ -28,29 +27,10 @@ async function main() {
     () =>
       createZipFile(
         'build.zip',
-        [
-          'dist/**/*',
-          'secrets/**/*',
-          'yarn.lock',
-          'package.json',
-          'Dockerfile',
-          '.dockerignore',
-        ],
+        ['dist/**/*', 'secrets/**/*', 'yarn.lock', 'package.json'],
         ['secrets/**/*.enc', 'secrets/**/*.d.ts'],
       ),
-    // Use the Elastic Beanstalk environment of this branch (create it if necessary)
-    () => {
-      const environments = shelljs
-        .exec('eb list')
-        .stdout.trim()
-        .split('\n');
-      if (environments.indexOf(ebEnvironmentName) === -1) {
-        return executeCommand(`eb create ${ebEnvironmentName}`);
-      }
-      return undefined;
-    },
-    `eb use ${ebEnvironmentName}`,
-    'eb deploy --staged --debug',
+    `aws lambda update-function-code --function-name ${functionName} --zip-file build.zip`,
   ];
 
   let isDeployment = false;
