@@ -7,8 +7,15 @@
   "license": "Unlicense",
   "private": true,
   "scripts": {
-    "pretest": "npm-run-all -l --aggregate-output -s app/graphql/build -p validate-filenames lint",
-    "test": "run-p -l --aggregate-output app/test"
+    "pretest": "run-p -l --aggregate-output validate-filenames lint",
+    "test": "echo 0",
+    "build": "tsc --project ./src",
+    "clean": "rm -rf ./dist",
+    "lint": "run-p -l --aggregate-output lint-ts lint-js",
+    "lint-js": "eslint '**/*.js{,x}'",
+    "lint-ts": "tslint './*.ts' 'src/**/*.ts{,x}' --project .",
+    "validate-filenames": "validate-filenames --config commonconfig.js",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "aws-sdk": "^2.197.0"
