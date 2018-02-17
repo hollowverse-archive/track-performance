@@ -71,7 +71,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "run-p --aggregate-output validate-filenames lint-staged",
-      "pre-push": "yarn test",
+      "pre-push": "yarn pretest",
       "post-merge": "yarnhook",
       "post-checkout": "yarnhook",
       "post-rewrite": "yarnhook"
