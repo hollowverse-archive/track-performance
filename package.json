@@ -10,7 +10,9 @@
   "scripts": {
     "pretest": "run-p -l --aggregate-output validate-filenames lint",
     "test": "echo 0",
-    "build": "tsc --project ./src",
+    "build-ts": "tsc --project ./src",
+    "build-babel": "babel dist -d dist",
+    "build": "run-s clean build-ts build-babel",
     "clean": "rm -rf ./dist",
     "lint": "run-p -l --aggregate-output lint-ts lint-js",
     "lint-js": "eslint '**/*.js{,x}'",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.40",
     "@babel/core": "^7.0.0-beta.40",
+    "@babel/polyfill": "^7.0.0-beta.40",
     "@babel/preset-env": "^7.0.0-beta.40",
     "@hollowverse/common": "hollowverse/common",
     "@hollowverse/validate-filenames": "^1.3.5",
@@ -72,6 +75,19 @@
       "post-checkout": "yarnhook",
       "post-rewrite": "yarnhook"
     }
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "6.10"
+          },
+          "useBuiltIns": "entry"
+        }
+      ]
+    ]
   },
   "engines": {
     "node": ">= 6.10"
