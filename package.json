@@ -1,5 +1,6 @@
 {
   "name": "perf-monitor",
+  "description": "An AWS Lambda function that checks and reports the performance of hollowverse.com regularly",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:hollowverse/perf-monitor.git",
