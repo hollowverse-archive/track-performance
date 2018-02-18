@@ -412,8 +412,13 @@ declare module 'webpagetest' {
   type Script = any[];
 
   class WebPageTest {
-    constructor(url: string = 'www.webpagetest.org');
-    constructor(url: string, apiKey: string);
+    constructor(
+      /**
+       * @default 'www.webpagetest.org'
+       */
+      url?: string,
+      apiKey?: string,
+    );
 
     getTestStatus(id: string, options: CommonOptions, callback: Callback): void;
     getTestStatus(id: string, callback: Callback): void;
@@ -442,7 +447,7 @@ declare module 'webpagetest' {
       options: CommonOptions &
         RunTestOptions &
         ApiKeyOptions &
-        RequsetOptions &
+        RequestOptions &
         ResultOptions,
       callback: Callback,
     ): void;
