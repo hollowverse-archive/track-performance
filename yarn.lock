@@ -510,8 +510,8 @@
     to-fast-properties "^2.0.0"
 
 "@hollowverse/common@hollowverse/common":
-  version "2.3.0"
-  resolved "https://codeload.github.com/hollowverse/common/tar.gz/19caab6364caa099deaa2200584e4357a4205abc"
+  version "2.4.0"
+  resolved "https://codeload.github.com/hollowverse/common/tar.gz/fb96f2657acc6c03145c64470619e474d1c278c6"
   dependencies:
     glob "^7.1.2"
     jszip "^3.1.4"
