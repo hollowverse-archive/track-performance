@@ -433,12 +433,12 @@ declare module 'webpagetest' {
 
     runTest(
       /** decoded url or script string */
-      url_or_script: string,
+      urlOrScript: string,
       callback: Callback,
     ): void;
     runTest(
       /** decoded url or script string */
-      url_or_script: string,
+      urlOrScript: string,
       options: CommonOptions &
         RunTestOptions &
         ApiKeyOptions &
