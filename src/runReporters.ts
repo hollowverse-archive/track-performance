@@ -12,17 +12,12 @@ const API_KEY = process.env.WPT_API_KEY;
 export const runReporters: Handler = async (_event, _context, callback) => {
   const wpt = new WebPageTest('www.webpagetest.org', API_KEY);
 
-  const runTest = bluebird.promisify(wpt.runTest).bind(wpt);
-  const getTestResults = bluebird.promisify(wpt.getTestResults).bind(wpt);
-  const { data: { testId } }: WebPageTest.RunTestResponse = await runTest(
-    'https://hollowverse.com',
-    {
-      lighthouse: true,
-    },
-  );
+  const { data: { testId } } = await bluebird.fromNode<
+    WebPageTest.RunTestResponse
+  >(cb => wpt.runTest('https://hollowverse.com', cb));
 
   // tslint:disable-next-line:no-console
-  console.log(await getTestResults(testId));
+  console.log(await bluebird.fromNode(cb => wpt.getTestResults(testId, cb)));
 
   callback(null, 'Hello World');
 };
