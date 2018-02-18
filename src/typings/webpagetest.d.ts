@@ -16,10 +16,10 @@ declare module 'webpagetest' {
 
   type RunTestOptions = {
     /** location to test from */
-    location: string;
+    location?: string;
 
     /** connectivity profile -- requires location to be specified */
-    connectivity:
+    connectivity?:
       | 'Cable'
       | 'DSL'
       | 'FIOS'
@@ -33,233 +33,233 @@ declare module 'webpagetest' {
      * number of test runs
      * @default 1
      */
-    runs: number;
+    runs?: number;
 
     /** skip the Repeat View test */
-    firstViewOnly: boolean;
+    firstViewOnly?: boolean;
 
     /** capture video */
-    video: boolean;
+    video?: boolean;
 
     /** keep the test hidden from the test log */
-    private: boolean;
+    private?: boolean;
 
     /** label for the test */
-    label: string;
+    label?: string;
 
     /** stop test at document complete. typically, tests run until all activity stops */
-    stopAtDocumentComplete: boolean;
+    stopAtDocumentComplete?: boolean;
 
     /** disable JavaScript (IE, Chrome, Firefox) */
-    disableJavaScript: boolean;
+    disableJavaScript?: boolean;
 
     /** clear SSL certificate caches */
-    clearCerts: boolean;
+    clearCerts?: boolean;
 
     /** ignore SSL certificate errors, e.g. name mismatch, self-signed certificates, etc. */
-    ignoreSSL: boolean;
+    ignoreSSL?: boolean;
 
     /** forces all pages to load in standards mode (IE only) */
-    disableCompatibilityView: boolean;
+    disableCompatibilityView?: boolean;
 
     /** capture network packet trace (tcpdump) */
-    tcpDump: boolean;
+    tcpDump?: boolean;
 
     /** save response bodies for text resources */
-    saveResponseBodies: boolean;
+    saveResponseBodies?: boolean;
 
     /** do not add PTST to the original browser User Agent string */
-    keepOriginalUserAgent: boolean;
+    keepOriginalUserAgent?: boolean;
 
     /** DOM element to record for sub-measurement */
-    domElement: string;
+    domElement?: string;
 
     /** minimum test duration in seconds */
-    minimumDuration: number;
+    minimumDuration?: number;
 
     /** run the test on a specific PC (name must match exactly or the test will not run) */
-    tester: string;
+    tester?: string;
 
     /**
      * (experimental) emulate mobile browser: Chrome mobile user agent,
      * 640x960 screen, 2x scaling and fixed viewport (Chrome only)
      */
-    emulateMobile: boolean;
+    emulateMobile?: boolean;
 
     /** capture Developer Tools Timeline (Chrome only) */
-    timeline: boolean;
+    timeline?: boolean;
 
     /**
      * set between 1-5 to include the JS call stack. must be used in conjunction with
      * timeline (increases overhead) (Chrome only)
      */
-    timelineCallStack: boolean;
+    timelineCallStack?: boolean;
 
     /** capture chrome trace (about://tracing) (Chrome only) */
-    chromeTrace: boolean;
+    chromeTrace?: boolean;
 
     /** capture Network Log (Chrome only) */
-    netLog: boolean;
+    netLog?: boolean;
 
     /** enable data reduction on Chrome 34+ Android (Chrome only) */
-    dataReduction: boolean;
+    dataReduction?: boolean;
 
     /** custom user agent string (Chrome only) */
-    userAgent: string;
+    userAgent?: string;
 
     /** use a list of custom command line switches (Chrome only) */
-    commandLine: string;
+    commandLine?: string;
 
     /** username for authenticating tests (http authentication) */
-    login: string;
+    login?: string;
 
     /** password for authenticating tests (http authentication) */
-    password: string;
+    password?: string;
 
     /** discard script and http headers in the result */
-    sensitive: boolean;
+    sensitive?: boolean;
 
     /** disable saving of the http headers (as well as browser status messages and CPU utilization) */
-    disableHTTPHeaders: boolean;
+    disableHTTPHeaders?: boolean;
 
     /** space-delimited list of urls to block (substring match) */
-    block: string;
+    block?: string;
 
     /**
      * space-delimited list of domains to simulate failure by re-routing to
      * blackhole.webpagetest.org to silently drop all requests
      */
-    spof: string;
+    spof?: string;
 
     /** execute arbitrary JavaScript at the end of a test to collect custom metrics */
-    customMetrics: string;
+    customMetrics?: string;
 
     /**
      * type of authentication: 0 = Basic, 1 = SNS
      * @default 0
      */
-    authenticationType: 0 | 1;
+    authenticationType?: 0 | 1;
 
     /** e-mail address to notify with the test results */
-    notifyEmail: string;
+    notifyEmail?: string;
 
     /** URL to ping when the test is complete (the test ID will be passed as an "id" parameter) */
-    pingback: string;
+    pingback?: string;
 
     /** download bandwidth in Kbps (used when specifying a custom connectivity profile) */
-    bandwidthDown: string;
+    bandwidthDown?: string;
 
     /** upload bandwidth in Kbps (used when specifying a custom connectivity profile) */
-    bandwidthUp: string;
+    bandwidthUp?: string;
 
     /** first-hop Round Trip Time in ms (used when specifying a custom connectivity profile) */
-    latency: string;
+    latency?: string;
 
     /**
      * packet loss rate - percent of packets to drop
      * (used when specifying a custom connectivity profile)
      */
-    packetLossRate: string;
+    packetLossRate?: string;
 
     /** disable optimization checks (for faster testing) */
-    disableOptimization: boolean;
+    disableOptimization?: boolean;
 
     /** disable screen shot capturing */
-    disableScreenshot: boolean;
+    disableScreenshot?: boolean;
 
     /** save a full-resolution version of the fully loaded screen shot as a PNG */
-    fullResolutionScreenshot: boolean;
+    fullResolutionScreenshot?: boolean;
 
     /** jpeg compression level (30-100) for the screen shots and video capture */
-    jpegQuality: number;
+    jpegQuality?: number;
 
     /** store the video from the median run when capturing video is enabled */
-    medianVideo: boolean;
+    medianVideo?: boolean;
 
     /** save the content of only the base HTML response */
-    htmlBody: boolean;
+    htmlBody?: boolean;
 
     /**
      * test name to use when submitting results to tsviewdb
      * (for private instances that have integrated with tsviewdb)
      */
-    tsView: string;
+    tsView?: string;
 
     /**
      * configs to use when submitting results to tsviewdb
      * (for private instances that have integrated with tsviewdb)
      */
-    tsViewConfigs: string;
+    tsViewConfigs?: string;
 
     /**
      * String to hash test to a specific test agent.
      * Tester will be picked by index among available testers
      */
-    affinity: string;
+    affinity?: string;
 
     /**
      * change test priority (0-9)
      * Default: [enforced by API key, otherwise 5]
      */
-    priority: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+    priority?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
     /** block ads defined by http://adblockplus.org */
-    blockAds: boolean;
+    blockAds?: boolean;
 
     /** capture video continuously (unstable/experimental, may cause tests to fail) */
-    continuousVideoCapture: boolean;
+    continuousVideoCapture?: boolean;
 
     /** force SPDY version 3 (Chrome only) */
-    forceSpdy3: boolean;
+    forceSpdy3?: boolean;
 
     /** force software rendering, disable GPU acceleration (Chrome only) */
-    forceSoftwareRendering: boolean;
+    forceSoftwareRendering?: boolean;
 
     /**
      * poll for results after test is scheduled at every seconds
      * @default 5
      */
-    pollResults: number;
+    pollResults?: number;
 
     /**
      * wait for test results informed by agent once complete listening on
      * : [hostname:first port available above 8000]
      */
-    waitResults: string;
+    waitResults?: string;
 
     /**
      * timeout for polling and waiting results
      * Default: [no timeout]
      */
-    timeout: string;
+    timeout?: string;
     /** perform lighthouse test (Chrome only, Linux agent only) */
-    lighthouse: boolean;
+    lighthouse?: boolean;
   };
 
   type RequestOptions = {
     /** echo request ID: string, useful to track asynchronous requests */
-    requestId: string;
+    requestId?: string;
   };
 
   type ResultOptions = {
     /** include the breakdown of requests and bytes by mime type */
-    breakDown: boolean;
+    breakDown?: boolean;
     /** include the breakdown of requests and bytes by domain */
-    domains: boolean;
+    domains?: boolean;
     /** include the PageSpeed score in the response (may be slower) */
-    pageSpeed: boolean;
+    pageSpeed?: boolean;
     /** include the request data in the response (slower and results in much larger responses) */
-    requests: boolean;
+    requests?: boolean;
     /** set the metric used to calculate median for multiple runs tests (default: loadTime) */
-    medianMetric: string;
+    medianMetric?: string;
     /** set the specs for performance test suite */
-    specs: string;
+    specs?: string;
 
     /**
      * set performance test suite reporter output
      * @default 'dot'
      */
-    reporter:
+    reporter?:
       | 'dot'
       | 'spec'
       | 'tap'
@@ -280,16 +280,16 @@ declare module 'webpagetest' {
      * the test run number for multiple runs tests
      * @default 1 // first test
      */
-    run: number;
+    run?: number;
     /** if `true` returns the repeat view (cached) data */
-    repeatView: boolean;
+    repeatView?: boolean;
   };
 
   type ImageOptions = {
     /** returns the thumbnail of actual image */
-    thumbnail: boolean;
+    thumbnail?: boolean;
     /** returns the base64 string representation (inline) of actual image */
-    dataURI: boolean;
+    dataURI?: boolean;
   };
 
   type ApiKeyOptions = {
@@ -297,24 +297,24 @@ declare module 'webpagetest' {
      *  API key (if assigned).
      * Contact the WebPageTest server administrator for a key if required
      */
-    key: string;
+    key?: string;
   };
 
   type ScreenshotOptions = {
     /** returns the full resolution screenshot in PNG format if available */
-    fullResolution: boolean;
+    fullResolution?: boolean;
 
     /**
      * returns the page screenshot at the Start Render point
      * (i.e.: when something was first displayed on screen)
      */
-    startRender: boolean;
+    startRender?: boolean;
 
     /**
      * returns the page screenshot at the Document Complete point
      * (i.e.: when window.onload was fired)
      */
-    documentComplete: boolean;
+    documentComplete?: boolean;
   };
 
   type WaterfallOptions = {
@@ -322,51 +322,51 @@ declare module 'webpagetest' {
      * set the chart type: waterfall or connection
      * @default 'waterfall`
      */
-    chartType: 'waterfall' | 'connection';
+    chartType?: 'waterfall' | 'connection';
     /**
      * set chart coloring by MIME type
      * @default false
      */
-    colorByMime: boolean;
+    colorByMime?: boolean;
     /**
      * chart image width in px (300-2000)
      * @default 930
      */
-    chartWidth: number;
+    chartWidth?: number;
 
     /**
      * set maximum time in seconds
      * Default: (automatic)
      */
-    maxTime: number;
+    maxTime?: number;
 
     /**
      * filter requests
      * Default: (all)
      * @example '1,2,3,4-9,8'
      */
-    requests: string;
+    requests?: string;
 
     /**
      * hide CPU utilization
      * @default false
      */
-    noCPU: boolean;
+    noCPU?: boolean;
     /**
      * hide bandwidth utilization
      * @default false
      */
-    noBandwidth: boolean;
+    noBandwidth?: boolean;
     /**
      * hide ellipsis (...) for missing items
      * @default false
      */
-    noEllipsis: boolean;
+    noEllipsis?: boolean;
     /**
      * hide labels for requests (URL)
      * @default false
      */
-    noLabels: boolean;
+    noLabels?: boolean;
   };
 
   type VideoOptions = {
@@ -379,7 +379,7 @@ declare module 'webpagetest' {
      *
      * @default 'visual'
      */
-    comparisonEndPoint: 'visual' | 'all' | 'doc' | 'full';
+    comparisonEndPoint?: 'visual' | 'all' | 'doc' | 'full';
   };
 
   type ResponseOptions = {
@@ -387,14 +387,14 @@ declare module 'webpagetest' {
      * the request number
      * @default 1
      */
-    request: number;
+    request?: number;
   };
 
   type ListenOptions = {
     /** private key file path to use for SSL */
-    key: string;
+    key?: string;
     /** public x509 certificate file path to use for SSL */
-    cert: string;
+    cert?: string;
   };
 
   type ImageInfo = {
@@ -412,13 +412,12 @@ declare module 'webpagetest' {
   type Script = any[];
 
   class WebPageTest {
-    constructor(
-      /**
-       * @default 'www.webpagetest.org'
-       */
-      url?: string,
-      apiKey?: string,
-    );
+    /**
+     *
+     * @param url defaults to `'www.webpagetest.org'`
+     * @param apiKey
+     */
+    constructor(url?: string, apiKey?: string);
 
     getTestStatus(id: string, options: CommonOptions, callback: Callback): void;
     getTestStatus(id: string, callback: Callback): void;
@@ -569,4 +568,6 @@ declare module 'webpagetest' {
 
     scriptToString(script: Script): void;
   }
+
+  export = WebPageTest;
 }
