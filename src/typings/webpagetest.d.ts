@@ -1,4 +1,4 @@
-declare module 'webpagetest' {
+namespace WebPageTest {
   type CommonOptions = {
     /**
      * if `true`, method does not make an actual request to the API Server but rather
@@ -402,6 +402,22 @@ declare module 'webpagetest' {
     encoding: 'utf8' | 'binary';
   };
 
+  type Response<D> = {
+    statusCode: number;
+    statusText: string;
+    data: D;
+  };
+
+  export type RunTestResponse = Response<{
+    testId: string;
+    ownerKey: string;
+    jsonUrl: string;
+    xmlUrl: string;
+    userUrl: string;
+    summaryCSV: string;
+    detailsCSV: string;
+  }>;
+
   type Callback<D = any> = (error: Error, data: D) => void;
   type CallbackWithInfo<D = any, I = ImageInfo> = (
     error: Error,
@@ -438,7 +454,7 @@ declare module 'webpagetest' {
     runTest(
       /** decoded url or script string */
       urlOrScript: string,
-      callback: Callback,
+      callback: Callback<RunTestResponse>,
     ): void;
     runTest(
       /** decoded url or script string */
@@ -448,7 +464,7 @@ declare module 'webpagetest' {
         ApiKeyOptions &
         RequestOptions &
         ResultOptions,
-      callback: Callback,
+      callback: Callback<RunTestResponse>,
     ): void;
 
     cancelTest(id: string, callback: Callback): void;
@@ -569,5 +585,9 @@ declare module 'webpagetest' {
     scriptToString(script: Script): void;
   }
 
-  export = WebPageTest;
+  export { WebPageTest };
+}
+
+declare module 'webpagetest' {
+  export = WebPageTest.WebPageTest;
 }
