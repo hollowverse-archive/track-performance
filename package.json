@@ -23,6 +23,7 @@
     "deploy": "synp --source-file yarn.lock && sls deploy"
   },
   "dependencies": {
+    "@octokit/rest": "^14.0.9",
     "aws-sdk": "^2.197.0",
     "bluebird": "^3.5.1",
     "got": "^8.1.0",

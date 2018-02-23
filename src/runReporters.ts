@@ -11,6 +11,7 @@ import WebPageTest, {
 } from 'webpagetest';
 import bluebird from 'bluebird';
 import { getNumberOfRequests } from './helpers/webpagetest';
+import { octokit } from './helpers/github';
 
 const API_KEY = process.env.WPT_API_KEY;
 const testId = '180130_TZ_35993622f9c0ec75ca70ddbacf6b7675';
@@ -70,6 +71,15 @@ export const runReporters: Handler = async (_event, _context) => {
     const lighthouseKeys = Object.keys(lighthouseKeyToName) as [
       keyof typeof lighthouseKeyToName
     ];
+
+    const issues = await octokit.issues.getForRepo({
+      owner: 'hollowverse',
+      repo: 'hollowverse',
+      state: 'open',
+      per_page: 5,
+    });
+
+    console.log(issues.data.map((issue: any) => issue.title));
 
     if (results.statusCode === 200) {
       const firstView = results.data.runs[1].firstView;
