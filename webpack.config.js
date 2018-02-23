@@ -24,6 +24,9 @@ module.exports = {
         test: /.ts$/i,
         use: [
           {
+            loader: 'babel-loader',
+          },
+          {
             loader: 'ts-loader',
           },
         ],

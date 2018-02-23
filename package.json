@@ -44,6 +44,7 @@
     "@types/node": "6",
     "@types/webpack": "^3.8.8",
     "babel-eslint": "^8.2.1",
+    "babel-loader": "^8.0.0-beta.0",
     "babel-minify-webpack-plugin": "^0.3.0",
     "eslint": "^4.18.0",
     "eslint-config-airbnb": "^16.1.0",
@@ -100,19 +101,6 @@
       "post-checkout": "yarnhook",
       "post-rewrite": "yarnhook"
     }
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "node": "6.10"
-          },
-          "useBuiltIns": "entry"
-        }
-      ]
-    ]
   },
   "engines": {
     "node": ">= 6.10"
