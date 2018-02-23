@@ -10,18 +10,17 @@ import WebPageTest, {
   TestResults,
 } from 'webpagetest';
 import bluebird from 'bluebird';
-import { getNumberOfRequests } from './helpers/webpagetest';
-import { octokit } from './helpers/github';
+import {
+  getNumberOfRequests,
+  lighthouseKeys,
+  lighthouseKeyToName,
+  hasLighthouseData,
+} from './helpers/webpagetest';
 
 const API_KEY = process.env.WPT_API_KEY;
 const testId = '180130_TZ_35993622f9c0ec75ca70ddbacf6b7675';
 
-const hasLighthouseData = (
-  view: TestResults.View,
-): view is TestResults.View<TestResults.LighthouseResults> => {
-  return 'lighthouse.Performance' in view;
-};
-
+// tslint:disable no-console
 export const runReporters: Handler = async (_event, _context) => {
   const wpt = new WebPageTest('www.webpagetest.org', API_KEY);
 
@@ -36,50 +35,6 @@ export const runReporters: Handler = async (_event, _context) => {
     >(cb => {
       wpt.getTestResults(testId, cb);
     });
-
-    const lighthouseKeyToName: Record<
-      keyof TestResults.LighthouseResults,
-      { name: string; unit: 'percent' | 'ms' | 'none' }
-    > = {
-      'lighthouse.Performance': { name: 'Performance', unit: 'percent' },
-      'lighthouse.Performance.first-meaningful-paint': {
-        name: 'First Meaningful Paint',
-        unit: 'ms',
-      },
-      'lighthouse.Performance.first-interactive': {
-        name: 'First Interactive',
-        unit: 'ms',
-      },
-      'lighthouse.Performance.consistently-interactive': {
-        name: 'Consistently Interactive',
-        unit: 'ms',
-      },
-      'lighthouse.Performance.speed-index-metric': {
-        name: 'Speed Index Metric',
-        unit: 'none',
-      },
-      'lighthouse.Performance.estimated-input-latency': {
-        name: 'Estimated Input Latency',
-        unit: 'ms',
-      },
-      'lighthouse.ProgressiveWebApp': { name: 'PWA', unit: 'percent' },
-      'lighthouse.Accessibility': { name: 'Accessibility', unit: 'percent' },
-      'lighthouse.BestPractices': { name: 'Best Practices', unit: 'percent' },
-      'lighthouse.SEO': { name: 'SEO', unit: 'percent' },
-    };
-
-    const lighthouseKeys = Object.keys(lighthouseKeyToName) as [
-      keyof typeof lighthouseKeyToName
-    ];
-
-    const issues = await octokit.issues.getForRepo({
-      owner: 'hollowverse',
-      repo: 'hollowverse',
-      state: 'open',
-      per_page: 5,
-    });
-
-    console.log(issues.data.map((issue: any) => issue.title));
 
     if (results.statusCode === 200) {
       const firstView = results.data.runs[1].firstView;

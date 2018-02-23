@@ -1,3 +1,5 @@
+// tslint:disable
+
 // interface RootObject {
 //   data: Data;
 //   statusCode: number;

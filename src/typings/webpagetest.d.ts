@@ -693,11 +693,6 @@ declare module 'webpagetest' {
         >
       >,
     ): void;
-    getTestResults(
-      id: string,
-      options: CommonOptions,
-      callback: Callback<Response<TestResults.BaseTestResults>>,
-    ): void;
 
     getLocations(callback: Callback): void;
     getLocations(options: CommonOptions, callback: Callback): void;
