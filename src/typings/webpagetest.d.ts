@@ -402,11 +402,21 @@ namespace WebPageTest {
     encoding: 'utf8' | 'binary';
   };
 
-  type Response<D> = {
-    statusCode: number;
-    statusText: string;
-    data: D;
-  };
+  type Response<D> =
+    | {
+        statusCode: 100 | 101 | 102 | 103 | 104 | 105;
+        statusText: string;
+        data: D;
+      }
+    | {
+        statusCode: 200 | 201;
+        statusText: string;
+        data: D;
+      }
+    | {
+        statusCode: 400 | 403 | 404 | 500 | 501 | 503;
+        statusText: string;
+      };
 
   export type RunTestResponse = Response<{
     testId: string;

@@ -1,8 +1,5 @@
 {
   "extends": "./node_modules/@hollowverse/common/tsconfig.json",
-  "compilerOptions": {
-    "checkJs": false,
-    "allowJs": false
-  },
-  "exclude": ["*/**/dist", "node_modules"]
+  "compilerOptions": {},
+  "exclude": ["./dist", "node_modules"]
 }
