@@ -1,4 +1,4 @@
-namespace WebPageTest {
+declare module 'webpagetest' {
   type CommonOptions = {
     /**
      * if `true`, method does not make an actual request to the API Server but rather
@@ -122,7 +122,7 @@ namespace WebPageTest {
     /** disable saving of the http headers (as well as browser status messages and CPU utilization) */
     disableHTTPHeaders?: boolean;
 
-    /** space-delimited list of urls to block (substring match) */
+    /** space-delimited list of urls to lick (substring match) */
     block?: string;
 
     /**
@@ -402,7 +402,234 @@ namespace WebPageTest {
     encoding: 'utf8' | 'binary';
   };
 
-  type Response<D> =
+  export namespace TestResults {
+    type Images = {
+      waterfall: string;
+      connectionView: string;
+      checklist: string;
+      screenShot: string;
+    };
+
+    type Thumbnails = {
+      waterfall: string;
+      checklist: string;
+      screenShot: string;
+    };
+
+    type View<T = {}> = T & {
+      numSteps: number;
+      run: number;
+      tester: string;
+      minify_total: number;
+      responses_200: number;
+      testStartOffset: number;
+      bytesOut: number;
+      gzip_savings: number;
+      requestsFull: number;
+      start_epoch: number;
+      connections: number;
+      bytesOutDoc: number;
+      result: number;
+      final_base_page_request_id: string;
+      base_page_dns_ns: string;
+      docTime: number;
+      domContentLoadedEventEnd: number;
+      image_savings: number;
+      requestsDoc: number;
+      score_cookies: number;
+      base_page_ip_ptr: string;
+      score_cdn: number;
+      optimization_checked: number;
+      score_minify: number;
+      gzip_total: number;
+      responses_404: number;
+      loadTime: number;
+      URL: string;
+      score_combine: number;
+      score_etags: number;
+      image_total: number;
+      loadEventStart: number;
+      minify_savings: number;
+      score_progressive_jpeg: number;
+      base_page_cdn: string;
+      score_gzip: number;
+      score_compress: number;
+      domContentLoadedEventStart: number;
+      final_url: string;
+      bytesInDoc: number;
+      'score_keep-alive': number;
+      loadEventEnd: number;
+      cached: number;
+      score_cache: number;
+      responses_other: number;
+      main_frame: string;
+      fullyLoaded: number;
+      requests: Request[];
+      final_base_page_request: number;
+      TTFB: number;
+      bytesIn: number;
+      browserVersion: string;
+      test_run_time_ms: number;
+      firstPaint: number;
+      browser_name: string;
+      eventName: string;
+      browser_version: string;
+      date: number;
+      domElements: number;
+      domInteractive: number;
+      custom: string[];
+      Images: string;
+      Colordepth: number;
+      Resolution: string;
+      Dpi: string;
+      step: number;
+      effectiveBps: number;
+      effectiveBpsDoc: number;
+      render: number;
+      domTime: number;
+      aft: number;
+      titleTime: number;
+      domLoading: number;
+      lastVisualChange: number;
+      visualComplete: number;
+      server_rtt: number;
+      smallImageCount: number;
+      bigImageCount: number;
+      maybeCaptcha: number;
+      pages: Pages;
+      thumbnails: Thumbnails;
+      images: Images;
+      rawData: RawData;
+      domains: Domains;
+      breakdown: Breakdown;
+      consoleLog: any[];
+    };
+
+    type RawData = {
+      headers: string;
+      pageData: string;
+      requestsData: string;
+      utilization: string;
+      trace: string;
+    };
+
+    type LighthouseResults = {
+      'lighthouse.Performance': number;
+      'lighthouse.Performance.first-meaningful-paint': number;
+      'lighthouse.Performance.first-interactive': number;
+      'lighthouse.Performance.consistently-interactive': number;
+      'lighthouse.Performance.speed-index-metric': number;
+      'lighthouse.Performance.estimated-input-latency': number;
+      'lighthouse.ProgressiveWebApp': number;
+      'lighthouse.Accessibility': number;
+      'lighthouse.BestPractices': number;
+      'lighthouse.SEO': number;
+    };
+
+    type ChromeUserTimingResults = {
+      chromeUserTiming: ChromeUserTiming[];
+      'chromeUserTiming.fetchStart': number;
+      'chromeUserTiming.redirectStart': number;
+      'chromeUserTiming.redirectEnd': number;
+      'chromeUserTiming.responseEnd': number;
+      'chromeUserTiming.unloadEventStart': number;
+      'chromeUserTiming.unloadEventEnd': number;
+      'chromeUserTiming.domLoading': number;
+      'chromeUserTiming.domInteractive': number;
+      'chromeUserTiming.firstLayout': number;
+      'chromeUserTiming.firstPaint': number;
+      'chromeUserTiming.firstContentfulPaint': number;
+      'chromeUserTiming.firstTextPaint': number;
+      'chromeUserTiming.firstMeaningfulPaintCandidate': number;
+      'chromeUserTiming.firstMeaningfulPaint': number;
+      'chromeUserTiming.firstImagePaint': number;
+      'chromeUserTiming.domContentLoadedEventStart': number;
+      'chromeUserTiming.domContentLoadedEventEnd': number;
+      'chromeUserTiming.InteractiveTime': number;
+      'chromeUserTiming.domComplete': number;
+      'chromeUserTiming.loadEventStart': number;
+      'chromeUserTiming.loadEventEnd': number;
+    };
+
+    interface Breakdown {
+      html: BreakdownData;
+      js: BreakdownData;
+      css: BreakdownData;
+      image: BreakdownData;
+      flash: BreakdownData;
+      font: BreakdownData;
+      video: BreakdownData;
+      other: BreakdownData;
+    }
+
+    interface BreakdownData {
+      color: number[];
+      bytes: number;
+      bytesUncompressed: number;
+      requests: number;
+    }
+
+    type Domains = Record<string, DomainData>;
+
+    type DomainData = {
+      bytes: number;
+      requests: number;
+      cdn_provider?: string;
+      connections: number;
+    };
+
+    interface Pages {
+      details: string;
+      checklist: string;
+      breakdown: string;
+      domains: string;
+      screenShot: string;
+    }
+
+    export type BaseTestResults<T = {}> = {
+      id: string;
+      url: string;
+      summary: string;
+      testUrl: string;
+      location: string;
+      from: string;
+      connectivity: string;
+      bwDown: number;
+      bwUp: number;
+      latency: number;
+      plr: string;
+      mobile: number;
+      completed: number;
+      tester: string;
+      runs: [
+        {
+          firstView: View<T>;
+          repeatView?: View<T>;
+        }
+      ];
+      fvonly: boolean;
+      successfulFVRuns: number;
+      successfulRVRuns: number;
+      average: {
+        firstView: View<T>;
+        repeatView?: View<T>;
+      };
+      standardDeviation: {
+        firstView: View<T>;
+        repeatView?: View<T>;
+      };
+      median: {
+        firstView: View<T>;
+        repeatView: View<T>;
+      };
+    };
+
+    export type BaseTestResultsWithLighthouse = BaseTestResults<
+      LighthouseResults
+    >;
+  }
+
+  export type Response<D> =
     | {
         statusCode: 100 | 101 | 102 | 103 | 104 | 105;
         statusText: string;
@@ -445,14 +672,31 @@ namespace WebPageTest {
      */
     constructor(url?: string, apiKey?: string);
 
-    getTestStatus(id: string, options: CommonOptions, callback: Callback): void;
-    getTestStatus(id: string, callback: Callback): void;
+    getTestStatus(
+      id: string,
+      options: CommonOptions,
+      callback: Callback<Response<any>>,
+    ): void;
+    getTestStatus(id: string, callback: Callback<Response<any>>): void;
 
-    getTestResults(id: string, callback: Callback): void;
+    getTestResults(
+      id: string,
+      callback: Callback<Response<TestResults.BaseTestResults>>,
+    ): void;
     getTestResults(
       id: string,
       options: CommonOptions,
-      callback: Callback,
+      callback: Callback<
+        Response<
+          | TestResults.BaseTestResults
+          | TestResults.BaseTestResultsWithLighthouse
+        >
+      >,
+    ): void;
+    getTestResults(
+      id: string,
+      options: CommonOptions,
+      callback: Callback<Response<TestResults.BaseTestResults>>,
     ): void;
 
     getLocations(callback: Callback): void;
@@ -570,9 +814,9 @@ namespace WebPageTest {
       callback: CallbackWithInfo,
     ): void;
 
-    createVideo(tests, callback: Callback): void;
+    createVideo(tests: string[], callback: Callback): void;
     createVideo(
-      tests,
+      tests: string[],
       options: CommonOptions & VideoOptions,
       callback: Callback,
     ): void;
@@ -595,9 +839,5 @@ namespace WebPageTest {
     scriptToString(script: Script): void;
   }
 
-  export { WebPageTest };
-}
-
-declare module 'webpagetest' {
-  export = WebPageTest.WebPageTest;
+  export default WebPageTest;
 }

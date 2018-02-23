@@ -3,11 +3,11 @@ service: perf-monitor
 plugins:
   - serverless-webpack
 
-package:
-  individually: true
+# package:
+#   individually: true
 
-custom:
-  webpackIncludeModules: true # enable auto-packing of external modules
+# custom:
+#   webpackIncludeModules: true # enable auto-packing of external modules
 
 provider:
   name: aws
@@ -51,6 +51,10 @@ functions:
     handler: src/handler.hello
   runReporters:
     handler: src/runReporters.runReporters
+
+package:
+  exclude:
+    - .webpack
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events

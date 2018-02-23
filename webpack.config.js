@@ -10,9 +10,11 @@ const { ifProd } = require('./env');
 
 module.exports = {
   entry: slsw.lib.entries,
+  target: 'node',
+  devtool: 'source-map',
   output: {
     libraryTarget: 'commonjs',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '.webpack'),
     filename: '[name].js',
   },
   stats: 'minimal',
@@ -27,6 +29,9 @@ module.exports = {
         ],
       },
     ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
   },
   plugins: [
     new webpack.WatchIgnorePlugin([/node_modules/]),

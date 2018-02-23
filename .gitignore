@@ -59,5 +59,6 @@ build
 
 # Created by Serverless
 .build
+.webpack
 
 package-lock.json
