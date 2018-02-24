@@ -122,7 +122,7 @@ declare module 'webpagetest' {
     /** disable saving of the http headers (as well as browser status messages and CPU utilization) */
     disableHTTPHeaders?: boolean;
 
-    /** space-delimited list of urls to lick (substring match) */
+    /** space-delimited list of urls to block (substring match) */
     block?: string;
 
     /**
