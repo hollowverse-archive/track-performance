@@ -6,6 +6,7 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const BabelMinifyPlugin = require('babel-minify-webpack-plugin');
 const { mapValues } = require('lodash');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { ifProd } = require('./env');
 
 module.exports = {
@@ -37,6 +38,12 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: 'secrets/**',
+        to: '.',
+      },
+    ]),
     new webpack.WatchIgnorePlugin([/node_modules/]),
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin(

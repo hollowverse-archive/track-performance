@@ -53,6 +53,9 @@ functions:
     handler: src/runReporters.runReporters
 
 package:
+  include:
+    - src/**
+    - secrets/**
   exclude:
     - .webpack
 
