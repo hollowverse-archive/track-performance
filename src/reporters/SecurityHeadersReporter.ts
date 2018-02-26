@@ -9,7 +9,7 @@ export class SecurityHeadersReporter implements Reporter {
     this.url = url;
   }
 
-  async getReports() {
+  async getReports(): Promise<Report[]> {
     const response = await got.head('https://securityheaders.io/', {
       query: {
         q: this.url,
@@ -18,7 +18,7 @@ export class SecurityHeadersReporter implements Reporter {
       followRedirect: true,
     });
 
-    return <Report[]>[
+    return [
       {
         name: 'Security Headers',
         records: [

@@ -6,14 +6,15 @@
 import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 import { collectReports } from './helpers/collectReports';
 import { format as formatDate } from 'date-fns';
-import { source, stripIndents } from 'common-tags';
+import bluebird from 'bluebird';
 import NodeGit from 'nodegit';
 import { join, relative } from 'path';
 import fs from 'fs';
 import { octokit } from './helpers/github';
+import { generateAggregatedReport } from './helpers/generateReport';
 import tmp from 'tmp';
-import { SecurityHeadersReporter } from './reporters/securityheaders';
-// import { WebPageTestReporter } from './reporters/wpt';
+import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 
 const sshKeyPublicKeyPath = join(process.cwd(), 'secrets/rsa_id.pub');
 const sshPrivateKeyPath = join(process.cwd(), 'secrets/rsa_id');
@@ -21,37 +22,26 @@ const sshPrivateKeyPath = join(process.cwd(), 'secrets/rsa_id');
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
 export const runReporters: Handler = async (_event, _context) => {
-  const reports = await collectReports({
-    url: 'https://hollowverse.com',
-    reporters: [SecurityHeadersReporter],
+  const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
+  const date = new Date();
+  const dateStr = formatDate(date, 'YYYY-MM-DD');
+
+  const renderedReports = await bluebird.map(urls, async url => {
+    const reports = await collectReports({
+      url,
+      reporters: [SecurityHeadersReporter, WebPageTestReporter],
+    });
+
+    return generateAggregatedReport({
+      reports,
+      date,
+      testedUrl: url,
+    });
   });
 
+  const reportBody = renderedReports.join('\n\n');
+
   const repoTempDir = tmp.dirSync().name;
-
-  const date = formatDate(new Date(), 'YYYY-MM-DD');
-
-  const reportBody = stripIndents`
-        Report for tests performed on ${date}
-        ========================================
-        ${source`
-          ${reports.map(report => {
-            return `\n${source`
-              ${report.name}
-              -----------------------
-
-              Test | First View | Repeat View
-              -----|------------|-------------
-              ${report.records.map(({ name, scores, formatScore }) => {
-                return `${name} | ${formatScore(
-                  scores.firstView,
-                )} | ${formatScore(scores.repeatView)}`;
-              })}
-            `}`;
-          })}
-        `}
-      `;
-
-  console.log(reportBody);
 
   const credentials = (_url: string, userName: string) => {
     return NodeGit.Cred.sshKeyNew(
@@ -62,7 +52,7 @@ export const runReporters: Handler = async (_event, _context) => {
     );
   };
 
-  const branchName = `report-${date}`;
+  const branchName = `report-${dateStr}`;
   const repo = await NodeGit.Clone.clone(
     'git@github.com:hollowverse/perf-reports.git',
     repoTempDir,
@@ -125,7 +115,7 @@ export const runReporters: Handler = async (_event, _context) => {
       base: 'master',
       head: branchName,
       // @ts-ignore
-      title: `Update report to ${date}`,
+      title: `Update report to ${dateStr}`,
       body: reportBody,
     });
 

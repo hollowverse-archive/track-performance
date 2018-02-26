@@ -1,12 +1,34 @@
-import { TestResults } from 'webpagetest';
+import {
+  TestResults,
+  RunTestResponse,
+  Response,
+  SuccessResponse,
+} from 'webpagetest';
 
 export const getNumberOfRequests = (view: TestResults.View) =>
   view.requests.length;
 
+export const isSuccessfulResponse = <D = any>(
+  response: Response<D>,
+): response is SuccessResponse<D> => {
+  return response.statusCode === 200 || response.statusCode === 201;
+};
+
 export const hasLighthouseData = (
-  view: TestResults.View,
-): view is TestResults.View<TestResults.LighthouseResults> => {
-  return 'lighthouse.Performance' in view;
+  response: SuccessResponse<TestResults.BaseTestResults<any>>,
+): response is SuccessResponse<
+  TestResults.BaseTestResults<TestResults.LighthouseResults>
+> => {
+  return 'lighthouse.Performance' in response.data.average.firstView;
+};
+
+export const isWaitUntilTestCompleteResponse = <T = any>(
+  response: RunTestResponse<T>,
+): response is Response<TestResults.BaseTestResults<T>> => {
+  return (
+    (response as any).data !== undefined &&
+    !('testId' in (response as any).data)
+  );
 };
 
 export const lighthouseKeyToName: Record<

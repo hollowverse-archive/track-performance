@@ -16,8 +16,8 @@ export const collectReports = async ({
   return flatten(
     await bluebird.map(
       reporters,
-      R => {
-        const r = new R(url);
+      async ReporterClass => {
+        const r = new ReporterClass(url);
 
         return r.getReports();
       },

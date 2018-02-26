@@ -629,23 +629,25 @@ declare module 'webpagetest' {
     >;
   }
 
+  export type SuccessResponse<D> = {
+    statusCode: 200 | 201;
+    statusText: string;
+    data: D;
+  };
+
   export type Response<D> =
     | {
         statusCode: 100 | 101 | 102 | 103 | 104 | 105;
         statusText: string;
         data: D;
       }
-    | {
-        statusCode: 200 | 201;
-        statusText: string;
-        data: D;
-      }
+    | SuccessResponse<D>
     | {
         statusCode: 400 | 403 | 404 | 500 | 501 | 503;
         statusText: string;
       };
 
-  export type RunTestResponse = Response<{
+  export type RunTestWithoutWaitData = {
     testId: string;
     ownerKey: string;
     jsonUrl: string;
@@ -653,7 +655,11 @@ declare module 'webpagetest' {
     userUrl: string;
     summaryCSV: string;
     detailsCSV: string;
-  }>;
+  };
+
+  export type RunTestResponse<T = {}> =
+    | Response<RunTestWithoutWaitData>
+    | Response<TestResults.BaseTestResults<T>>;
 
   type Callback<D = any> = (error: Error, data: D) => void;
   type CallbackWithInfo<D = any, I = ImageInfo> = (

@@ -9,6 +9,7 @@ export type TestRecord = {
 
 export type Report = {
   name: string;
+  url?: string;
   records: TestRecord[];
 };
 export declare class Reporter {
