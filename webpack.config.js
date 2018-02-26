@@ -38,6 +38,7 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   plugins: [
+    // @ts-ignore
     new CopyWebpackPlugin([
       {
         from: 'secrets/**',

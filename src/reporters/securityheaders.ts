@@ -1,26 +1,36 @@
 import got from 'got';
-
-type Report = {
-  score: string;
-};
-
-declare class Reporter {
-  constructor(url: string);
-  getReport(): Promise<Report>;
-}
+import { Reporter, Report } from '../typings/reporter';
+import { defaultFormat } from '../helpers/format';
 
 export class SecurityHeadersReporter implements Reporter {
-  private url: string = this.url;
+  private url: string;
 
-  async getReport() {
-    const response = await got.head(this.url, {
+  constructor(url: string) {
+    this.url = url;
+  }
+
+  async getReports() {
+    const response = await got.head('https://securityheaders.io/', {
       query: {
+        q: this.url,
         followRedirects: true,
       },
+      followRedirect: true,
     });
 
-    return {
-      score: response.headers['x-grade'] as string,
-    };
+    return <Report[]>[
+      {
+        name: 'Security Headers',
+        records: [
+          {
+            name: 'Grade',
+            scores: {
+              firstView: response.headers['x-grade'] as string,
+            },
+            formatScore: defaultFormat,
+          },
+        ],
+      },
+    ];
   }
 }

@@ -681,7 +681,7 @@ declare module 'webpagetest' {
 
     getTestResults(
       id: string,
-      callback: Callback<Response<TestResults.BaseTestResults>>,
+      callback: Callback<Response<TestResults.BaseTestResultsWithLighthouse>>,
     ): void;
     getTestResults(
       id: string,
