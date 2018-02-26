@@ -13,11 +13,7 @@ export const generateAggregatedReport = ({
   date,
   testedUrl,
 }: GeneratedAggregatedReportOptions) => stripIndents`
-  Report for tests performed on ${date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })}
+  Report for tests performed on ${formatDate(date, 'YYYY-MM-DD')}
   ========================================
   URL tested: ${testedUrl}
 

@@ -4,6 +4,6 @@
     "allowJs": false,
     "checkJs": false,
     "maxNodeModuleJsDepth": 0,
-    "skipLibCheck": false
+    "skipLibCheck": true
   }
 }

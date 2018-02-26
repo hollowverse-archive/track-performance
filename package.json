@@ -15,7 +15,7 @@
     "build/babel": "babel dist -d dist",
     "build": "run-s clean build/ts build/babel",
     "clean": "rm -rf ./dist",
-    "lint": "run-p -l --aggregate-output lint-ts lint-js",
+    "lint": "run-p -l --aggregate-output lint-ts lint-js check-ts",
     "lint-js": "eslint '**/*.js{,x}'",
     "lint-ts": "tslint './*.ts' 'src/**/*.ts{,x}' --project .",
     "validate-filenames": "validate-filenames --config commonconfig.js",
