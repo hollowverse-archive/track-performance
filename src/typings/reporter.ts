@@ -16,6 +16,6 @@ export type Report = {
 };
 
 export declare class Reporter {
-  constructor(url: string, config?: Partial<GlobalConfig>);
+  constructor(url: string, config?: Pick<GlobalConfig, keyof GlobalConfig>);
   getReports(): Promise<Report[]>;
 }

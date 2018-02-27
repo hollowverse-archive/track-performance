@@ -34,6 +34,9 @@
     "tmp": "^0.0.33",
     "webpagetest": "^0.3.8"
   },
+  "resolutions": {
+    "webpack-sources": "1.0.1"
+  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.40",
     "@babel/core": "^7.0.0-beta.40",
@@ -76,7 +79,7 @@
     "tslint-microsoft-contrib": "^5.0.3",
     "tslint-react": "^3.5.1",
     "typescript": "^2.7.2",
-    "webpack": "^3.11.0",
+    "webpack": "3",
     "webpack-node-externals": "^1.6.0",
     "yarnhook": "^0.1.1"
   },
