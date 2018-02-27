@@ -5,32 +5,37 @@
 const shelljs = require('shelljs');
 const decryptSecrets = require('@hollowverse/common/helpers/decryptSecrets');
 const executeCommands = require('@hollowverse/common/helpers/executeCommands');
-const createZipFile = require('@hollowverse/common/helpers/createZipFile');
 
-const { ENC_PASS_SUMO, IS_PULL_REQUEST, PROJECT, BRANCH } = shelljs.env;
+const {
+  ENC_PASS_GITHUB,
+  ENC_PASS_WPT,
+  ENC_PASS_SSH_PRIVATE_KEY,
+  IS_PULL_REQUEST,
+} = shelljs.env;
 
 const isPullRequest = IS_PULL_REQUEST !== 'false';
 
 const secrets = [
   {
-    password: ENC_PASS_SUMO,
-    decryptedFilename: 'sumo.json',
+    password: ENC_PASS_GITHUB,
+    decryptedFilename: 'github.json',
+  },
+  {
+    password: ENC_PASS_WPT,
+    decryptedFilename: 'webpagetest.json',
+  },
+  {
+    password: ENC_PASS_SSH_PRIVATE_KEY,
+    decryptedFilename: 'sshPrivateKey',
   },
 ];
 
-const functionName = `${PROJECT}-${BRANCH}`;
-
 async function main() {
-  const buildCommands = ['yarn test', 'yarn build'];
+  const buildCommands = ['yarn test'];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    () =>
-      createZipFile(
-        'build.zip',
-        ['dist/**/*', 'secrets/**/*', 'yarn.lock', 'package.json'],
-        ['secrets/**/*.enc', 'secrets/**/*.d.ts'],
-      ),
-    `aws lambda update-function-code --function-name ${functionName} --zip-file build.zip`,
+    'yarn synp --source-file yarn.lock',
+    `yarn serverless --deploy --stage production`,
   ];
 
   let isDeployment = false;

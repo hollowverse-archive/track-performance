@@ -1,11 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist",
-    "checkJs": false,
     "allowJs": false,
+    "checkJs": false,
     "maxNodeModuleJsDepth": 0,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "skipLibCheck": true
   }
 }

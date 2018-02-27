@@ -56,3 +56,13 @@ build
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Created by Serverless
+.build
+.webpack
+
+# We use yarn instead, but serverless-webpack uses npm
+# to install the dependencies before deploying the functions.
+# We use `synp` to convert yarn.lock to package-lock.json
+# before deployment. See the npm `deploy` script in `package.json`.
+package-lock.json

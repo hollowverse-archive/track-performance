@@ -6,6 +6,10 @@ module.exports = {
       patterns: ['*/**'],
     },
     {
+      validation: 'PascalCase',
+      patterns: ['src/reporters/*.ts'],
+    },
+    {
       validation: 'ignore',
       patterns: [
         '*/**/typings/*',

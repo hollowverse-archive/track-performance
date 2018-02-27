@@ -1,0 +1,31 @@
+service: perf-monitor
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpackIncludeModules: true # Enable auto-packing of external modules
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: ${opt:stage, 'dev'}
+  environment:
+    GITHUB_TOKEN: ${file(./secrets/github.json):token}
+    WPT_API_KEY: ${file(./secrets/webpagetest.json):apiKey}
+
+functions:
+  runReporters:
+    handler: src/runReporters.runReporters
+    events:
+      - schedule:
+          rate: rate(24 hours)
+          enabled: true
+
+package:
+  include:
+    - src/**
+    - secrets/**
+  exclude:
+    - .webpack
+
