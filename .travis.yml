@@ -10,7 +10,9 @@ script:
     -e IS_PULL_REQUEST=$TRAVIS_PULL_REQUEST
     -e AWS_ACCESS_KEY_ID
     -e AWS_SECRET_ACCESS_KEY
-    -e ENC_PASS_SUMO
+    -e ENC_PASS_WPT
+    -e ENC_PASS_GITHUB
+    -e ENC_PASS_SSH_PRIVATE_KEY
     hollowverse/build-env
 
 notifications:
