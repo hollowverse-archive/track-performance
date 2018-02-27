@@ -5,5 +5,7 @@ export const writeFile = async (
   path: string,
   contents: string | Buffer | ReadableStream,
 ) => {
-  await bluebird.fromNode(cb => fs.writeFile(path, contents, cb));
+  await bluebird.fromNode(cb => {
+    fs.writeFile(path, contents, cb);
+  });
 };
