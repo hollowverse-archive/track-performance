@@ -1,3 +1,5 @@
+import { GlobalConfig } from '../config';
+
 export type TestRecord = {
   name: string;
   scores: {
@@ -12,7 +14,8 @@ export type Report = {
   url?: string;
   records: TestRecord[];
 };
+
 export declare class Reporter {
-  constructor(url: string);
+  constructor(url: string, config?: Partial<GlobalConfig>);
   getReports(): Promise<Report[]>;
 }

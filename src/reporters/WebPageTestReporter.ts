@@ -19,17 +19,32 @@ import {
   defaultFormat,
   formatBytesAsKibibytes,
 } from '../helpers/format';
-
-const API_KEY = process.env.WPT_API_KEY;
+import { GlobalConfig } from '../config';
 
 export class WebPageTestReporter implements Reporter {
   //@ts-ignore
   private url: string;
   private wpt: WebPageTest;
 
-  constructor(url: string) {
+  constructor(
+    url: string,
+    config?: Partial<Pick<GlobalConfig, 'webpagetest'>>,
+  ) {
+    if (
+      config === undefined ||
+      config.webpagetest === undefined ||
+      !config.webpagetest.apiKey
+    ) {
+      throw new TypeError(
+        'Expected global configuration to include WPT configuration',
+      );
+    }
+
     this.url = url;
-    this.wpt = new WebPageTest('www.webpagetest.org', API_KEY);
+    this.wpt = new WebPageTest(
+      'www.webpagetest.org',
+      config.webpagetest.apiKey,
+    );
   }
 
   static getLighthouseRecords(

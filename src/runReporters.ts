@@ -15,9 +15,7 @@ import { generateAggregatedReport } from './helpers/generateReport';
 import tmp from 'tmp';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-
-const sshKeyPublicKeyPath = join(process.cwd(), 'secrets/rsa_id.pub');
-const sshPrivateKeyPath = join(process.cwd(), 'secrets/rsa_id');
+import { config } from './config';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
@@ -29,6 +27,7 @@ export const runReporters: Handler = async (_event, _context) => {
   const renderedReports = await bluebird.map(urls, async url => {
     const reports = await collectReports({
       url,
+      config,
       reporters: [SecurityHeadersReporter, WebPageTestReporter],
     });
 
@@ -46,8 +45,8 @@ export const runReporters: Handler = async (_event, _context) => {
   const credentials = (_url: string, userName: string) => {
     return NodeGit.Cred.sshKeyNew(
       userName,
-      sshKeyPublicKeyPath,
-      sshPrivateKeyPath,
+      config.sshKeyPublicKeyPath,
+      config.sshPrivateKeyPath,
       '',
     );
   };
