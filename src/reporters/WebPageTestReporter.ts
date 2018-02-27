@@ -22,7 +22,6 @@ import {
 import { GlobalConfig } from '../config';
 
 export class WebPageTestReporter implements Reporter {
-  //@ts-ignore
   private url: string;
   private wpt: WebPageTest;
 
@@ -71,7 +70,6 @@ export class WebPageTestReporter implements Reporter {
   }
 
   async getReports(): Promise<Report[]> {
-    // '180130_TZ_35993622f9c0ec75ca70ddbacf6b7675'
     const runTestResponse = await bluebird.fromNode<RunTestResponse>(cb => {
       this.wpt.runTest(
         this.url,

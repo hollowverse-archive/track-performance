@@ -11,16 +11,12 @@
     "pretest": "run-p -l --aggregate-output validate-filenames lint",
     "test": "run-p -l --aggregate-output check-ts",
     "check-ts": "tsc --project ./src --noEmit",
-    "build/ts": "tsc --project ./src",
-    "build/babel": "babel dist -d dist",
-    "build": "run-s clean build/ts build/babel",
     "clean": "rm -rf ./dist",
     "lint": "run-p -l --aggregate-output lint-ts lint-js check-ts",
     "lint-js": "eslint '**/*.js{,x}'",
     "lint-ts": "tslint './*.ts' 'src/**/*.ts{,x}' --project .",
     "validate-filenames": "validate-filenames --config commonconfig.js",
-    "lint-staged": "lint-staged",
-    "deploy": "synp --source-file yarn.lock && sls deploy"
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
     "@octokit/rest": "^14.0.9",

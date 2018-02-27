@@ -9,7 +9,7 @@ import { format as formatDate } from 'date-fns';
 import bluebird from 'bluebird';
 import NodeGit from 'nodegit';
 import { join } from 'path';
-import { octokit } from './helpers/github';
+import Octokit from '@octokit/rest';
 import { renderReport } from './helpers/renderReport';
 import tmp from 'tmp';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
@@ -135,6 +135,13 @@ export const runReporters: Handler = async (_event, _context) => {
       callbacks: {
         credentials,
       },
+    });
+
+    const octokit = new Octokit();
+
+    octokit.authenticate({
+      token: config.github.token,
+      type: 'token',
     });
 
     await octokit.pullRequests.create({

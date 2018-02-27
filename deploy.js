@@ -31,10 +31,11 @@ const secrets = [
 ];
 
 async function main() {
-  const buildCommands = ['yarn test', 'yarn build'];
+  const buildCommands = ['yarn test'];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    `serverless --deploy --stage production`,
+    'yarn synp --source-file yarn.lock',
+    `yarn serverless --deploy --stage production`,
   ];
 
   let isDeployment = false;
