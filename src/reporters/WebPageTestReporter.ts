@@ -26,11 +26,7 @@ export class WebPageTestReporter implements Reporter {
   private wpt: WebPageTest;
 
   constructor(url: string, config?: Pick<GlobalConfig, 'webpagetest'>) {
-    if (
-      config === undefined ||
-      config.webpagetest === undefined ||
-      !config.webpagetest.apiKey
-    ) {
+    if (config === undefined || !config.webpagetest.apiKey) {
       throw new TypeError(
         'Expected global configuration to include WPT configuration',
       );
