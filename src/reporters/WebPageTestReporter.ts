@@ -25,10 +25,7 @@ export class WebPageTestReporter implements Reporter {
   private url: string;
   private wpt: WebPageTest;
 
-  constructor(
-    url: string,
-    config?: Partial<Pick<GlobalConfig, 'webpagetest'>>,
-  ) {
+  constructor(url: string, config?: Pick<GlobalConfig, 'webpagetest'>) {
     if (
       config === undefined ||
       config.webpagetest === undefined ||

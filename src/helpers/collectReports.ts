@@ -7,7 +7,10 @@ type CollectReportsOptions = {
   url: string;
   config: GlobalConfig;
   reporters: Array<
-    new (url: string, config?: Partial<GlobalConfig>) => Reporter
+    new (
+      url: string,
+      config?: Pick<GlobalConfig, keyof GlobalConfig>,
+    ) => Reporter
   >;
   concurrency?: number;
 };
