@@ -8,37 +8,58 @@ import { collectReports } from './helpers/collectReports';
 import { format as formatDate } from 'date-fns';
 import bluebird from 'bluebird';
 import NodeGit from 'nodegit';
-import { join, relative } from 'path';
-import fs from 'fs';
+import { join } from 'path';
 import { octokit } from './helpers/github';
-import { generateAggregatedReport } from './helpers/generateReport';
+import { renderReport } from './helpers/renderReport';
 import tmp from 'tmp';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { config } from './config';
+import { keyBy, mapValues } from 'lodash';
+import { writeFile } from './helpers/writeFile';
+import { stripIndents } from 'common-tags';
+import prettier from 'prettier';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
 export const runReporters: Handler = async (_event, _context) => {
   const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
-  const date = new Date();
-  const dateStr = formatDate(date, 'YYYY-MM-DD');
+  const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
 
-  const renderedReports = await bluebird.map(urls, async url => {
+  const results = await bluebird.map(urls, async url => {
     const reports = await collectReports({
       url,
       config,
       reporters: [SecurityHeadersReporter, WebPageTestReporter],
     });
 
-    return generateAggregatedReport({
-      reports,
-      date,
-      testedUrl: url,
-    });
+    return {
+      url,
+      raw: reports,
+      rendered: renderReport({
+        reports,
+      }),
+    };
   });
 
-  const reportBody = renderedReports.join('\n\n');
+  const rawReports = mapValues(keyBy(results, r => r.url), r => r.raw);
+  let markdownReport = stripIndents`
+    Report for tests performed on ${dateStr}
+    ========================================
+
+    ${results
+      .map(({ url, rendered }) => {
+        return stripIndents`
+          [${url}](${url})
+          ------------------------------
+
+          ${rendered}
+      `;
+      })
+      .join('\n'.repeat(3))}
+  `;
+
+  markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
 
   const repoTempDir = tmp.dirSync().name;
 
@@ -68,11 +89,19 @@ export const runReporters: Handler = async (_event, _context) => {
 
   console.log('Repo cloned to', repoPath);
 
-  const reportFilePath = join(repoPath, 'mostRecent.md');
+  const filesToAdd = {
+    'mostRecent.md': markdownReport,
+    'mostRecent.json': JSON.stringify(rawReports, undefined, 2),
+  };
 
-  fs.writeFileSync(reportFilePath, reportBody);
+  await bluebird.map(
+    Object.entries(filesToAdd),
+    async ([fileName, contents]) => {
+      await writeFile(join(repoPath, fileName), contents);
+    },
+  );
 
-  console.info('Report file written to', reportFilePath);
+  console.info('Report files written');
 
   const hollowbotSignature = NodeGit.Signature.now(
     'hollowbot',
@@ -90,10 +119,10 @@ export const runReporters: Handler = async (_event, _context) => {
   await repo.checkoutBranch(branchName);
 
   await repo.createCommitOnHead(
-    [relative(repoPath, reportFilePath)],
+    Object.keys(filesToAdd),
     hollowbotSignature,
     hollowbotSignature,
-    `Update report file with results from ${date}`,
+    `Update report file with results from ${dateStr}`,
   );
 
   const remote = await repo.getRemote('origin');
@@ -115,7 +144,7 @@ export const runReporters: Handler = async (_event, _context) => {
       head: branchName,
       // @ts-ignore
       title: `Update report to ${dateStr}`,
-      body: reportBody,
+      body: markdownReport,
     });
 
     console.log('Pull request created');
