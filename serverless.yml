@@ -11,8 +11,8 @@ provider:
   runtime: nodejs6.10
   stage: ${opt:stage, 'dev'}
   environment:
-    GITHUB_TOKEN: ${file(../github.json):token}
-    WPT_API_KEY: ${file(../webpagetest.json):apiKey}
+    GITHUB_TOKEN: ${file(./secrets/github.json):token}
+    WPT_API_KEY: ${file(./secrets/webpagetest.json):apiKey}
 
 functions:
   runReporters:
