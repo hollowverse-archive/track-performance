@@ -35,7 +35,7 @@ async function main() {
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
     'yarn synp --source-file yarn.lock',
-    `yarn serverless --deploy --stage production`,
+    'yarn serverless deploy --stage production',
   ];
 
   let isDeployment = false;
