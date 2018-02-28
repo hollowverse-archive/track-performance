@@ -37,9 +37,6 @@
     "tmp": "^0.0.33",
     "webpagetest": "^0.3.8"
   },
-  "resolutions": {
-    "webpack-sources": "1.0.1"
-  },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.40",
     "@babel/core": "^7.0.0-beta.40",
