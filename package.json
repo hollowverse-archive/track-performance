@@ -10,7 +10,9 @@
   "scripts": {
     "pretest": "run-p -l --aggregate-output validate-filenames lint",
     "test": "run-p -l --aggregate-output check-ts",
-    "check-ts": "tsc --project ./src --noEmit",
+    "check-ts/src": "tsc --project ./src --noEmit",
+    "check-ts/root": "tsc --project ./ --noEmit",
+    "check-ts": "run-p 'check-ts/*'",
     "clean": "rm -rf ./dist",
     "lint": "run-p -l --aggregate-output lint-ts lint-js check-ts",
     "lint-js": "eslint '**/*.js{,x}'",

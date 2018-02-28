@@ -1,13 +1,12 @@
-/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
-
-const webpack = require('webpack');
-const slsw = require('serverless-webpack');
-const path = require('path');
-const nodeExternals = require('webpack-node-externals');
-const BabelMinifyPlugin = require('babel-minify-webpack-plugin');
-const { mapValues } = require('lodash');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { ifProd } = require('./env');
+// tslint:disable:no-implicit-dependencies
+import webpack from 'webpack';
+import slsw from 'serverless-webpack';
+import path from 'path';
+import nodeExternals from 'webpack-node-externals';
+import BabelMinifyPlugin from 'babel-minify-webpack-plugin';
+import { mapValues } from 'lodash';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import { ifProd } from './env';
 
 module.exports = {
   entry: slsw.lib.entries,
@@ -52,7 +51,7 @@ module.exports = {
         {
           'process.env.NODE_ENV': process.env.NODE_ENV,
         },
-        v => JSON.stringify(v),
+        (v: any) => JSON.stringify(v),
       ),
     ),
     ...ifProd([new BabelMinifyPlugin()]),

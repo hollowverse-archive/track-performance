@@ -4,6 +4,7 @@ plugins:
   - serverless-webpack
 
 custom:
+  webpack: webpack.config.ts
   webpackIncludeModules: true # Enable auto-packing of external modules
 
 provider:
