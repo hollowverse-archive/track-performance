@@ -31,18 +31,11 @@ const secrets = [
 ];
 
 async function main() {
-  const buildCommands = ['yarn test'];
+  const buildCommands = ['npm test'];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    'yarn synp --source-file yarn.lock',
-
-    // #region workaround
-    // Workaround serverless-webpack issue https://github.com/serverless-heaven/serverless-webpack/issues/309
-    'rm -rf node_modules',
-    'npm install',
-    // #endregion workaround
-
-    'NODE_ENV=production yarn serverless deploy --stage production',
+    './node_modules/.bin/synp --source-file yarn.lock',
+    'NODE_ENV=production ./node_modules/.bin/serverless deploy --stage production',
   ];
 
   let isDeployment = false;
