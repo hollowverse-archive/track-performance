@@ -60,6 +60,7 @@ build
 # Created by Serverless
 .build
 .webpack
+.serverless
 
 # We use yarn instead, but serverless-webpack uses npm
 # to install the dependencies before deploying the functions.

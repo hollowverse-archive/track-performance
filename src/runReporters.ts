@@ -3,22 +3,25 @@
 // This is how `@types/*` packages can be used in TypeScript.
 //
 // Not to be confused with https://www.npmjs.com/package/aws-lambda
-import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
-import { collectReports } from './helpers/collectReports';
-import { format as formatDate } from 'date-fns';
-import bluebird from 'bluebird';
-import NodeGit from 'nodegit';
-import { join } from 'path';
 import Octokit from '@octokit/rest';
-import { renderReport } from './helpers/renderReport';
-import tmp from 'tmp';
-import { WebPageTestReporter } from './reporters/WebPageTestReporter';
-import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-import { config } from './config';
-import { keyBy, mapValues } from 'lodash';
-import { writeFile } from './helpers/writeFile';
-import { stripIndents } from 'common-tags';
+import bluebird from 'bluebird';
+import executeCommand from '@hollowverse/common/helpers/executeCommand';
+import executeCommands from '@hollowverse/common/helpers/executeCommands';
+import initGit from 'lambda-git';
 import prettier from 'prettier';
+import shelljs from 'shelljs';
+import tmp from 'tmp';
+import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
+import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
+import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+import { collectReports } from './helpers/collectReports';
+import { config } from './config';
+import { format as formatDate } from 'date-fns';
+import { join } from 'path';
+import { keyBy, mapValues } from 'lodash';
+import { renderReport } from './helpers/renderReport';
+import { stripIndents } from 'common-tags';
+import { writeFile } from './helpers/writeFile';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
@@ -61,81 +64,46 @@ export const runReporters: Handler = async (_event, _context) => {
 
   markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
 
-  const repoTempDir = tmp.dirSync().name;
-
-  const credentials = (_url: string, userName: string) => {
-    return NodeGit.Cred.sshKeyNew(
-      userName,
-      config.sshKeyPublicKeyPath,
-      config.sshPrivateKeyPath,
-      '',
-    );
-  };
-
+  const repoPath = tmp.dirSync().name;
   const branchName = `report-${dateStr}`;
-  const repo = await NodeGit.Clone.clone(
-    'git@github.com:hollowverse/perf-reports.git',
-    repoTempDir,
-    {
-      fetchOpts: {
-        callbacks: {
-          credentials,
-        },
-      },
-    },
-  );
-
-  const repoPath = repo.workdir();
-
-  console.log('Repo cloned to', repoPath);
-
   const filesToAdd = {
     'mostRecent.md': markdownReport,
     'mostRecent.json': JSON.stringify(rawReports, undefined, 2),
   };
 
-  await bluebird.map(
-    Object.entries(filesToAdd),
-    async ([fileName, contents]) => {
-      await writeFile(join(repoPath, fileName), contents);
+  await executeCommands([
+    async () => {
+      if (process.env.AWS) {
+        await initGit();
+        await executeCommands([
+          'git config --global user.name hollowbot',
+          'git config --global user.email hollowbot@hollowverse.com',
+        ]);
+      }
     },
-  );
-
-  console.info('Report files written');
-
-  const hollowbotSignature = NodeGit.Signature.now(
-    'hollowbot',
-    'hollowbot@hollowverse.com',
-  );
-
-  await repo.createBranch(
-    branchName,
-    await repo.getReferenceCommit('HEAD'),
-    false,
-    hollowbotSignature,
-    '',
-  );
-
-  await repo.checkoutBranch(branchName);
-
-  await repo.createCommitOnHead(
-    Object.keys(filesToAdd),
-    hollowbotSignature,
-    hollowbotSignature,
-    `Update report file with results from ${dateStr}`,
-  );
-
-  const remote = await repo.getRemote('origin');
-  const ref = await repo.getReference(branchName);
-
-  await NodeGit.Branch.setUpstream(ref, branchName);
+    () => {
+      shelljs.env.GIT_SSH_COMMAND = `ssh -i ${config.sshPrivateKeyPath}`;
+    },
+    `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
+    () => {
+      shelljs.cd(repoPath);
+    },
+    `git checkout -b ${branchName}`,
+    async () => {
+      await bluebird.map(
+        Object.entries(filesToAdd),
+        async ([fileName, contents]) => {
+          await writeFile(join(repoPath, fileName), contents);
+        },
+      );
+    },
+    `git add ${Object.keys(filesToAdd).join(' ')}`,
+    `git commit 'Update report file with results from ${dateStr}'`,
+    `git push origin -u ${branchName} --force`,
+  ]);
 
   if (process.env.PUSH === 'true') {
-    await remote.push([`+${ref.toString()}`], {
-      callbacks: {
-        credentials,
-      },
-    });
+    await executeCommand(`git push origin -u ${branchName} --force`);
 
     const octokit = new Octokit();
 
