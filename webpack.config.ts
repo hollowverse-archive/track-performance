@@ -21,7 +21,16 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /.ts$/i,
+        test: /\.js?$/i,
+        include: [/node_modules\/@hollowverse\/common/i],
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+        ],
+      },
+      {
+        test: /\.ts$/i,
         use: [
           {
             loader: 'babel-loader',
@@ -58,7 +67,7 @@ module.exports = {
   ],
   externals: [
     nodeExternals({
-      whitelist: ['@hollowverse/common'],
+      whitelist: [/@hollowverse/],
     }),
   ],
 };

@@ -33,7 +33,7 @@ const secrets = [
 async function main() {
   const buildCommands = [
     'rm -rf node_modules/webpack-sources',
-    'npm i webpack-sources@1.0.1 ',
+    'npm i webpack-sources@1.0.1',
     'npm test',
   ];
   const deploymentCommands = [
