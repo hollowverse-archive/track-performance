@@ -56,5 +56,9 @@ module.exports = {
     ),
     ...ifProd([new BabelMinifyPlugin()]),
   ],
-  externals: [nodeExternals()],
+  externals: [
+    nodeExternals({
+      whitelist: ['@hollowverse/common'],
+    }),
+  ],
 };
