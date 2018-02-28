@@ -99,7 +99,6 @@ export const runReporters: Handler = async (_event, _context) => {
     },
     `git add ${Object.keys(filesToAdd).join(' ')}`,
     `git commit 'Update report file with results from ${dateStr}'`,
-    `git push origin -u ${branchName} --force`,
   ]);
 
   if (process.env.PUSH === 'true') {
