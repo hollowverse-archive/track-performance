@@ -34,8 +34,8 @@ async function main() {
   const buildCommands = ['npm test'];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    './bin/node_modules/synp --source-file yarn.lock',
-    'NODE_ENV=production ./bin/node_modules/serverless deploy --stage production',
+    './node_modules/.bin/synp --source-file yarn.lock',
+    'NODE_ENV=production ./node_modules/.bin/serverless deploy --stage production',
   ];
 
   let isDeployment = false;
