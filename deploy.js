@@ -31,7 +31,11 @@ const secrets = [
 ];
 
 async function main() {
-  const buildCommands = ['npm test'];
+  const buildCommands = [
+    'rm -rf node_modules/webpack-sources',
+    'npm i webpack-sources@1.0.1 ',
+    'npm test',
+  ];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
     './node_modules/.bin/synp --source-file yarn.lock',
