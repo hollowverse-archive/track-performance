@@ -25,105 +25,112 @@ import { writeFile } from './helpers/writeFile';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
-export const runReporters: Handler = async (_event, _context) => {
-  const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
-  const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
+export const runReporters: Handler = async (_event, _context, done) => {
+  try {
+    const urls = [
+      'https://hollowverse.com',
+      'https://hollowverse.com/Tom_Hanks',
+    ];
+    const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
 
-  const results = await bluebird.map(urls, async url => {
-    const reports = await collectReports({
-      url,
-      config,
-      reporters: [SecurityHeadersReporter, WebPageTestReporter],
+    const results = await bluebird.map(urls, async url => {
+      const reports = await collectReports({
+        url,
+        config,
+        reporters: [SecurityHeadersReporter, WebPageTestReporter],
+      });
+
+      return {
+        url,
+        raw: reports,
+        rendered: renderReport({
+          reports,
+        }),
+      };
     });
 
-    return {
-      url,
-      raw: reports,
-      rendered: renderReport({
-        reports,
-      }),
+    const rawReports = mapValues(keyBy(results, r => r.url), r => r.raw);
+    let markdownReport = stripIndents`
+      Report for tests performed on ${dateStr}
+      ========================================
+
+      ${results
+        .map(({ url, rendered }) => {
+          return stripIndents`
+            [${url}](${url})
+            ------------------------------
+
+            ${rendered}
+        `;
+        })
+        .join('\n'.repeat(3))}
+    `;
+
+    markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
+
+    const repoPath = tmp.dirSync().name;
+    const branchName = `report-${dateStr}`;
+    const filesToAdd = {
+      'mostRecent.md': markdownReport,
+      'mostRecent.json': JSON.stringify(rawReports, undefined, 2),
     };
-  });
 
-  const rawReports = mapValues(keyBy(results, r => r.url), r => r.raw);
-  let markdownReport = stripIndents`
-    Report for tests performed on ${dateStr}
-    ========================================
+    await executeCommands([
+      async () => {
+        if (process.env.AWS) {
+          await initGit();
+          shelljs.env.GIT_TEMPLATE_DIR = process.env.GIT_TEMPLATE_DIR;
+          shelljs.env.GIT_EXEC_PATH = process.env.GIT_EXEC_PATH;
+          shelljs.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH;
+        }
+      },
+      () => {
+        shelljs.env.GIT_SSH_COMMAND = `ssh -o StrictHostKeyChecking=no -i ${
+          config.sshPrivateKeyPath
+        }`;
+      },
+      `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
+      () => {
+        shelljs.cd(repoPath);
+      },
+      'git config --local user.name hollowbot',
+      'git config --local user.email hollowbot@hollowverse.com',
+      `git checkout -b ${branchName}`,
+      async () => {
+        await bluebird.map(
+          Object.entries(filesToAdd),
+          async ([fileName, contents]) => {
+            await writeFile(join(repoPath, fileName), contents);
+          },
+        );
+      },
+      `git add ${Object.keys(filesToAdd).join(' ')}`,
+      `git commit 'Update report file with results from ${dateStr}'`,
+    ]);
 
-    ${results
-      .map(({ url, rendered }) => {
-        return stripIndents`
-          [${url}](${url})
-          ------------------------------
+    if (process.env.PUSH === 'true') {
+      await executeCommand(`git push origin -u ${branchName} --force`);
 
-          ${rendered}
-      `;
-      })
-      .join('\n'.repeat(3))}
-  `;
+      const octokit = new Octokit();
 
-  markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
+      octokit.authenticate({
+        token: config.github.token,
+        type: 'token',
+      });
 
-  const repoPath = tmp.dirSync().name;
-  const branchName = `report-${dateStr}`;
-  const filesToAdd = {
-    'mostRecent.md': markdownReport,
-    'mostRecent.json': JSON.stringify(rawReports, undefined, 2),
-  };
+      await octokit.pullRequests.create({
+        owner: 'hollowverse',
+        repo: 'perf-reports',
+        base: 'master',
+        head: branchName,
+        // @ts-ignore
+        title: `Update report to ${dateStr}`,
+        body: markdownReport,
+      });
 
-  await executeCommands([
-    async () => {
-      if (process.env.AWS) {
-        await initGit();
-        shelljs.env.GIT_TEMPLATE_DIR = process.env.GIT_TEMPLATE_DIR;
-        shelljs.env.GIT_EXEC_PATH = process.env.GIT_EXEC_PATH;
-        shelljs.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH;
-      }
-    },
-    () => {
-      shelljs.env.GIT_SSH_COMMAND = `ssh -o StrictHostKeyChecking=no -i ${
-        config.sshPrivateKeyPath
-      }`;
-    },
-    `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
-    () => {
-      shelljs.cd(repoPath);
-    },
-    'git config --local user.name hollowbot',
-    'git config --local user.email hollowbot@hollowverse.com',
-    `git checkout -b ${branchName}`,
-    async () => {
-      await bluebird.map(
-        Object.entries(filesToAdd),
-        async ([fileName, contents]) => {
-          await writeFile(join(repoPath, fileName), contents);
-        },
-      );
-    },
-    `git add ${Object.keys(filesToAdd).join(' ')}`,
-    `git commit 'Update report file with results from ${dateStr}'`,
-  ]);
-
-  if (process.env.PUSH === 'true') {
-    await executeCommand(`git push origin -u ${branchName} --force`);
-
-    const octokit = new Octokit();
-
-    octokit.authenticate({
-      token: config.github.token,
-      type: 'token',
-    });
-
-    await octokit.pullRequests.create({
-      owner: 'hollowverse',
-      repo: 'perf-reports',
-      base: 'master',
-      head: branchName,
-      // @ts-ignore
-      title: `Update report to ${dateStr}`,
-      body: markdownReport,
-    });
-
-    console.log('Pull request created');
+      done(null, 'Pull request created');
+    }
+  } catch (error) {
+    done(error);
   }
 };
