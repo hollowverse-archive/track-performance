@@ -79,13 +79,7 @@ export const runReporters: Handler = async (_event, _context, done) => {
       async () => {
         if (process.env.AWS === 'true') {
           await initGit();
-          console.log('shelljs', shelljs.env);
-          console.log('process.env', process.env);
-          shelljs.env.GIT_TEMPLATE_DIR = process.env.GIT_TEMPLATE_DIR;
-          shelljs.env.GIT_EXEC_PATH = process.env.GIT_EXEC_PATH;
-          shelljs.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH;
-          console.log('shelljs', shelljs.env);
-          console.log('process.env', process.env);
+          shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
         }
       },
       () => {
