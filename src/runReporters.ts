@@ -75,9 +75,9 @@ export const runReporters: Handler = async (_event, _context) => {
     async () => {
       if (process.env.AWS) {
         await initGit();
-        shelljs.env.GIT_TEMPLATE_DIR = process.env.GIT_TEMPLATE_DIR,
-        shelljs.env.GIT_EXEC_PATH = process.env.GIT_EXEC_PATH,
-        shelljs.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH
+        shelljs.env.GIT_TEMPLATE_DIR = process.env.GIT_TEMPLATE_DIR;
+        shelljs.env.GIT_EXEC_PATH = process.env.GIT_EXEC_PATH;
+        shelljs.env.LD_LIBRARY_PATH = process.env.LD_LIBRARY_PATH;
       }
     },
     () => {
