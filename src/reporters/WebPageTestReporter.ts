@@ -78,7 +78,7 @@ export class WebPageTestReporter implements Reporter {
       //   cb,
       // );
       this.wpt.getTestResults(
-        '180130_TZ_35993622f9c0ec75ca70ddbacf6b7675/',
+        '180303_NB_c72d6819fdf0a166e7ac1587757f31e6/',
         cb,
       );
     });
