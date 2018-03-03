@@ -3,8 +3,12 @@
 /* eslint-disable no-console */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 const shelljs = require('shelljs');
-const decryptSecrets = require('@hollowverse/common/helpers/decryptSecrets');
-const executeCommands = require('@hollowverse/common/helpers/executeCommands');
+const {
+  decryptSecrets,
+} = require('@hollowverse/common/helpers/decryptSecrets');
+const {
+  executeCommands,
+} = require('@hollowverse/common/helpers/executeCommands');
 
 const {
   ENC_PASS_GITHUB,
@@ -37,7 +41,7 @@ async function main() {
     'npm test',
   ];
   const deploymentCommands = [
-    () => decryptSecrets(secrets, './secrets'),
+    () => decryptSecrets(),
     './node_modules/.bin/synp --source-file yarn.lock',
     'NODE_ENV=production ./node_modules/.bin/serverless deploy --stage production',
   ];
