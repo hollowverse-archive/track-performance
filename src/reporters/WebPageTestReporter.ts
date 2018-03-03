@@ -70,7 +70,6 @@ export class WebPageTestReporter implements Reporter {
           connectivity: '3G',
           location: 'Dulles_MotoG4',
           lighthouse: true,
-          pageSpeed: true,
           keepOriginalUserAgent: true,
           pollResults: 5,
         },
