@@ -146,6 +146,8 @@ export class WebPageTestReporter implements Reporter {
         console.warn(oneLine`
           Could not find Lighthouse data in WPT API response.
           Does the location specified support Lighthouse?
+          For a list of test locations, see
+          http://www.webpagetest.org/getLocations.php?f=html
         `);
       }
 

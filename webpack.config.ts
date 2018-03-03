@@ -21,15 +21,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js?$/i,
-        include: [/node_modules\/@hollowverse\/common/i],
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-        ],
-      },
-      {
         test: /\.ts$/i,
         use: [
           {
@@ -65,9 +56,5 @@ module.exports = {
     ),
     ...ifProd([new BabelMinifyPlugin()]),
   ],
-  externals: [
-    nodeExternals({
-      whitelist: [/@hollowverse/],
-    }),
-  ],
+  externals: [nodeExternals()],
 };
