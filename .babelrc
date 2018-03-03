@@ -1,14 +1,17 @@
 {
   "presets": [
     [
-      "@babel/preset-env",
+      "@babel/env",
       {
         "targets": {
           "node": "6.10"
         },
-        "useBuiltIns": "entry"
+        "useBuiltIns": "usage"
       }
     ]
+  ],
+  "plugins": [
+    "@babel/transform-runtime"
   ],
   "sourceMap": "both",
   "retainLines": true
