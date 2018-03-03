@@ -45,7 +45,7 @@
     "@babel/polyfill": "^7.0.0-beta.40",
     "@babel/preset-env": "^7.0.0-beta.40",
     "@babel/register": "^7.0.0-beta.40",
-    "@hollowverse/validate-filenames": "^1.3.6",
+    "@hollowverse/validate-filenames": "^1.3.7",
     "@types/aws-lambda": "^0.0.32",
     "@types/bluebird": "^3.5.20",
     "@types/common-tags": "^1.4.0",
