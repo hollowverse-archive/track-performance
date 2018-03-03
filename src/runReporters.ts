@@ -75,10 +75,6 @@ export const runReporters: Handler = async (_event, _context) => {
     async () => {
       if (process.env.AWS) {
         await initGit();
-        await executeCommands([
-          'git config --global user.name hollowbot',
-          'git config --global user.email hollowbot@hollowverse.com',
-        ]);
       }
     },
     () => {
@@ -88,6 +84,8 @@ export const runReporters: Handler = async (_event, _context) => {
     () => {
       shelljs.cd(repoPath);
     },
+    'git config --local user.name hollowbot',
+    'git config --local user.email hollowbot@hollowverse.com',
     `git checkout -b ${branchName}`,
     async () => {
       await bluebird.map(
