@@ -84,10 +84,10 @@ export const runReporters: Handler = async (_event, _context, done) => {
       },
       () => {
         shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
-        shelljs.chmod(0o600, '/tmp/privateKey');
         shelljs.env.GIT_SSH_COMMAND =
           'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
       },
+      'chmod 600 /tmp/privateKey',
       `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
       () => {
         shelljs.cd(repoPath);
