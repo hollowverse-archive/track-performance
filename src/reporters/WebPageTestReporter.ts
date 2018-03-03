@@ -22,6 +22,7 @@ import {
 import { GlobalConfig } from '../config';
 
 export class WebPageTestReporter implements Reporter {
+  // @ts-ignore
   private url: string;
   private wpt: WebPageTest;
 
@@ -64,16 +65,20 @@ export class WebPageTestReporter implements Reporter {
 
   async getReports(): Promise<Report[]> {
     const runTestResponse = await bluebird.fromNode<RunTestResponse>(cb => {
-      this.wpt.runTest(
-        this.url,
-        {
-          connectivity: '3G',
-          location: 'Dulles_MotoG4',
-          lighthouse: true,
-          pageSpeed: true,
-          keepOriginalUserAgent: true,
-          pollResults: 5,
-        },
+      // this.wpt.runTest(
+      //   this.url,
+      //   {
+      //     connectivity: '3G',
+      //     location: 'Dulles_MotoG4',
+      //     lighthouse: true,
+      //     pageSpeed: true,
+      //     keepOriginalUserAgent: true,
+      //     pollResults: 5,
+      //   },
+      //   cb,
+      // );
+      this.wpt.getTestResults(
+        '180130_TZ_35993622f9c0ec75ca70ddbacf6b7675/',
         cb,
       );
     });
