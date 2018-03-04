@@ -4738,9 +4738,9 @@ known-css-properties@^0.6.0:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.6.1.tgz#31b5123ad03d8d1a3f36bd4155459c981173478b"
 
-lambda-git@forabi/lambda-git:
+lambda-git@^0.1.2:
   version "0.1.2"
-  resolved "https://codeload.github.com/forabi/lambda-git/tar.gz/0dbaab5d9cee1283f5b78959348d6f7de56892d5"
+  resolved "https://registry.yarnpkg.com/lambda-git/-/lambda-git-0.1.2.tgz#32ee82a47d7fc4e9c05ab03ae22b5572d8e642e4"
   dependencies:
     tar-fs "^1.14.0"
 

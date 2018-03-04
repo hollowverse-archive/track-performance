@@ -29,7 +29,7 @@
     "common-tags": "^1.7.2",
     "date-fns": "^1.29.0",
     "got": "^8.1.0",
-    "lambda-git": "forabi/lambda-git",
+    "lambda-git": "^0.1.2",
     "lighthouse": "^2.9.1",
     "lighthouse-security": "^0.6.0",
     "lodash": "^4.17.5",
