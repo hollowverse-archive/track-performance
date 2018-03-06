@@ -117,7 +117,7 @@ export const runReporters: Handler = async (_event, _context, done) => {
         type: 'token',
       });
 
-      await octokit.pullRequests.create({
+      const { id } = await octokit.pullRequests.create({
         owner: 'hollowverse',
         repo: 'perf-reports',
         base: 'master',
@@ -126,6 +126,16 @@ export const runReporters: Handler = async (_event, _context, done) => {
         title: `Update report to ${dateStr}`,
         body: markdownReport,
       });
+
+      try {
+        await octokit.pullRequests.merge({
+          owner: 'hollowverse',
+          repo: 'perf-reports',
+          number: id,
+        });
+      } catch {
+        console.error('Failed to merge PR.');
+      }
 
       done(null, 'Pull request created');
     }
