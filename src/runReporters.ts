@@ -127,6 +127,13 @@ export const runReporters: Handler = async (_event, _context, done) => {
         body: markdownReport,
       });
 
+      await octokit.issues.edit({
+        owner: 'hollowverse',
+        repo: 'perf-reports',
+        number,
+        labels: ['report'],
+      });
+
       try {
         await octokit.pullRequests.merge({
           owner: 'hollowverse',
