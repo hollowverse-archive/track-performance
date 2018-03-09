@@ -72,7 +72,6 @@ export const runReporters: Handler = async (_event, _context, done) => {
     const branchName = `report-${dateStr}`;
     const filesToAdd = {
       'mostRecent.md': markdownReport,
-      'mostRecent.json': JSON.stringify(rawReports, undefined, 2),
     };
 
     await executeCommands([
