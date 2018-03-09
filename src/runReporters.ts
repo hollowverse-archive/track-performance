@@ -18,7 +18,6 @@ import { collectReports } from './helpers/collectReports';
 import { config } from './config';
 import { format as formatDate } from 'date-fns';
 import { join } from 'path';
-import { keyBy, mapValues } from 'lodash';
 import { renderReport } from './helpers/renderReport';
 import { stripIndents } from 'common-tags';
 import { writeFile } from './helpers/writeFile';
@@ -49,7 +48,6 @@ export const runReporters: Handler = async (_event, _context, done) => {
       };
     });
 
-    const rawReports = mapValues(keyBy(results, r => r.url), r => r.raw);
     let markdownReport = stripIndents`
       Report for tests performed on ${dateStr}
       ========================================
