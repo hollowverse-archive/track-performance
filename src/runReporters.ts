@@ -135,6 +135,7 @@ export const runReporters: Handler = async (_event, _context, done) => {
           owner: 'hollowverse',
           repo: 'perf-reports',
           number,
+          merge_method: 'squash',
         });
       } catch (error) {
         console.error(`Failed to merge PR ${number}: ${error.message}`);
