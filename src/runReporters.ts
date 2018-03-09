@@ -1,8 +1,3 @@
-// The following module is actually @types/aws-lambda,
-// and it only provides types.
-// This is how `@types/*` packages can be used in TypeScript.
-//
-// Not to be confused with https://www.npmjs.com/package/aws-lambda
 import Octokit from '@octokit/rest';
 import bluebird from 'bluebird';
 import executeCommand from '@hollowverse/common/helpers/executeCommand';
@@ -114,7 +109,7 @@ export const runReporters: Handler = async (_event, _context, done) => {
         type: 'token',
       });
 
-      const { number } = await octokit.pullRequests.create({
+      const { data: { number } } = await octokit.pullRequests.create({
         owner: 'hollowverse',
         repo: 'perf-reports',
         base: 'master',
@@ -124,12 +119,16 @@ export const runReporters: Handler = async (_event, _context, done) => {
         body: markdownReport,
       });
 
-      await octokit.issues.edit({
-        owner: 'hollowverse',
-        repo: 'perf-reports',
-        number,
-        labels: ['report'],
-      });
+      try {
+        await octokit.issues.edit({
+          owner: 'hollowverse',
+          repo: 'perf-reports',
+          number,
+          labels: ['report'],
+        });
+      } catch (error) {
+        console.error(`Failed to set label on PR ${number}: ${error.message}`);
+      }
 
       try {
         await octokit.pullRequests.merge({
@@ -137,8 +136,8 @@ export const runReporters: Handler = async (_event, _context, done) => {
           repo: 'perf-reports',
           number,
         });
-      } catch {
-        console.error('Failed to merge PR.');
+      } catch (error) {
+        console.error(`Failed to merge PR ${number}: ${error.message}`);
       }
 
       done(null, 'Pull request created');
