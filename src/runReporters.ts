@@ -137,6 +137,8 @@ export const runReporters: Handler = async (_event, _context, done) => {
           number,
           merge_method: 'squash',
         });
+
+        await executeCommand(`git push origin --delete ${branchName}`);
       } catch (error) {
         console.error(`Failed to merge PR ${number}: ${error.message}`);
       }
