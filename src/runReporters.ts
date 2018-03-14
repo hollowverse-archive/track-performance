@@ -22,8 +22,8 @@ import { writeFile } from './helpers/writeFile';
 export const runReporters: Handler = async (_event, _context, done) => {
   try {
     const urls = [
-      'https://hollowverse.com/?branch=master',
-      'https://hollowverse.com/Tom_Hanks?branch=master',
+      'https://hollowverse.com',
+      'https://hollowverse.com/Tom_Hanks',
     ];
     const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
 
