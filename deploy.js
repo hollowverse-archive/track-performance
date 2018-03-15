@@ -38,7 +38,6 @@ async function main() {
   const buildCommands = ['yarn test'];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    'yarn synp --source-file yarn.lock',
     'NODE_ENV=production yarn serverless deploy --stage production',
   ];
 

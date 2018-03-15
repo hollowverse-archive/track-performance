@@ -4,8 +4,10 @@ plugins:
   - serverless-webpack
 
 custom:
-  webpack: webpack.config.ts
-  webpackIncludeModules: true # Enable auto-packing of external modules
+  webpack:
+    webpackConfig: webpack.config.ts
+    packager: 'yarn'
+    includeModules: true # Enable auto-packing of external modules
 
 provider:
   name: aws
