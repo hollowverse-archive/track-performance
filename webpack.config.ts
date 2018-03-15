@@ -3,12 +3,11 @@ import webpack from 'webpack';
 import slsw from 'serverless-webpack';
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
-import BabelMinifyPlugin from 'babel-minify-webpack-plugin';
-import { mapValues } from 'lodash';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import { ifProd } from './env';
+import { isProd } from './env';
 
 module.exports = {
+  mode: isProd ? 'production' : 'development',
   entry: slsw.lib.entries,
   target: 'node',
   devtool: 'source-map',
@@ -45,16 +44,6 @@ module.exports = {
       },
     ]),
     new webpack.WatchIgnorePlugin([/node_modules/]),
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.DefinePlugin(
-      mapValues(
-        {
-          'process.env.NODE_ENV': process.env.NODE_ENV,
-        },
-        (v: any) => JSON.stringify(v),
-      ),
-    ),
-    ...ifProd([new BabelMinifyPlugin()]),
   ],
   externals: [nodeExternals()],
 };
