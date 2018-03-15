@@ -506,7 +506,7 @@
     pirates "^3.0.1"
     source-map-support "^0.4.2"
 
-"@babel/runtime@^7.0.0-beta.40":
+"@babel/runtime@^7.0.0-beta.40", "@babel/runtime@^7.0.0-beta.41":
   version "7.0.0-beta.41"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.0.0-beta.41.tgz#776ce13391b8154ccfdea71018a47b63e4d97e74"
   dependencies:
