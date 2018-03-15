@@ -22,6 +22,16 @@ import {
 import { GlobalConfig } from '../config';
 
 export class WebPageTestReporter implements Reporter {
+  // tslint:disable-next-line:no-multiline-string
+  static customUserAgent = oneLine`
+    Mozilla/5.0 (Linux;
+    Android 4.4.2; Nexus 4 Build/KOT49H)
+    AppleWebKit/537.36 (KHTML, like Gecko)
+    Chrome/65.0.3325.162
+    Mobile Safari/537.36
+    WebPageTest
+  `;
+
   private url: string;
   private wpt: WebPageTest;
 
@@ -72,6 +82,7 @@ export class WebPageTestReporter implements Reporter {
           lighthouse: true,
           keepOriginalUserAgent: true,
           pollResults: 5,
+          userAgent: WebPageTestReporter.customUserAgent,
         },
         cb,
       );
