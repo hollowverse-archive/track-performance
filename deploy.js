@@ -13,6 +13,7 @@ const {
 const {
   ENC_PASS_GITHUB,
   ENC_PASS_WPT,
+  ENC_PASS_GOOGLE,
   ENC_PASS_SSH_PRIVATE_KEY,
   IS_PULL_REQUEST,
 } = shelljs.env;
@@ -27,6 +28,10 @@ const secrets = [
   {
     password: ENC_PASS_WPT,
     decryptedFilename: 'webpagetest.json',
+  },
+  {
+    password: ENC_PASS_GOOGLE,
+    decryptedFilename: 'google.json',
   },
   {
     password: ENC_PASS_SSH_PRIVATE_KEY,

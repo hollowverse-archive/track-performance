@@ -16,6 +16,7 @@ provider:
   environment:
     GITHUB_TOKEN: ${file(./secrets/github.json):token}
     WPT_API_KEY: ${file(./secrets/webpagetest.json):apiKey}
+    GOOGLE_API_KEY: ${file(./secrets/google.json):apiKey}
 
 functions:
   runReporters:
