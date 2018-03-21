@@ -7,6 +7,7 @@ import tmp from 'tmp';
 import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
 import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { collectReports } from './helpers/collectReports';
 import { config } from './config';
 import { format as formatDate } from 'date-fns';
@@ -32,7 +33,11 @@ export const runReporters: Handler = async (_event, _context, done) => {
       const reports = await collectReports({
         url,
         config,
-        reporters: [SecurityHeadersReporter, WebPageTestReporter],
+        reporters: [
+          SecurityHeadersReporter,
+          WebPageTestReporter,
+          MobileFriendlinessReporter,
+        ],
       });
 
       return {
