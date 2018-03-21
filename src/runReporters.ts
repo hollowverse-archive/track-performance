@@ -1,7 +1,5 @@
 import Octokit from '@octokit/rest';
 import bluebird from 'bluebird';
-import executeCommand from '@hollowverse/common/helpers/executeCommand';
-import executeCommands from '@hollowverse/common/helpers/executeCommands';
 import initGit from 'lambda-git';
 import prettier from 'prettier';
 import shelljs from 'shelljs';
@@ -16,6 +14,9 @@ import { join } from 'path';
 import { renderReport } from './helpers/renderReport';
 import { stripIndents } from 'common-tags';
 import { writeFile } from './helpers/writeFile';
+import { executeCommand } from '@hollowverse/common/helpers/executeCommand';
+import { executeCommands } from '@hollowverse/common/helpers/executeCommands';
+import { retryCommand } from '@hollowverse/common/helpers/retryCommand';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
@@ -131,12 +132,14 @@ export const runReporters: Handler = async (_event, _context, done) => {
       }
 
       try {
-        await octokit.pullRequests.merge({
-          owner: 'hollowverse',
-          repo: 'perf-reports',
-          number,
-          merge_method: 'squash',
-        });
+        await retryCommand(async () => {
+          await octokit.pullRequests.merge({
+            owner: 'hollowverse',
+            repo: 'perf-reports',
+            number,
+            merge_method: 'squash',
+          });
+        }, 3);
 
         await executeCommand(`git push origin --delete ${branchName}`);
       } catch (error) {
