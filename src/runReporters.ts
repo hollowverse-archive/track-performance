@@ -5,8 +5,8 @@ import prettier from 'prettier';
 import shelljs from 'shelljs';
 import tmp from 'tmp';
 import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
-// import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-// import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
+import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { collectReports } from './helpers/collectReports';
 import { config } from './config';
@@ -34,8 +34,8 @@ export const runReporters: Handler = async (_event, _context, done) => {
         url,
         config,
         reporters: [
-          // SecurityHeadersReporter,
-          // WebPageTestReporter,
+          SecurityHeadersReporter,
+          WebPageTestReporter,
           MobileFriendlinessReporter,
         ],
       });
@@ -67,47 +67,45 @@ export const runReporters: Handler = async (_event, _context, done) => {
 
     markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
 
-    console.log(markdownReport);
+    const repoPath = tmp.dirSync().name;
+    const branchName = `report-${dateStr}`;
+    const filesToAdd = {
+      'mostRecent.md': markdownReport,
+    };
+
+    await executeCommands([
+      async () => {
+        if (process.env.AWS === 'true') {
+          await initGit();
+          shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
+        }
+      },
+      () => {
+        shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
+        shelljs.env.GIT_SSH_COMMAND =
+          'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
+      },
+      'chmod 600 /tmp/privateKey',
+      `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
+      () => {
+        shelljs.cd(repoPath);
+      },
+      'git config --local user.name hollowbot',
+      'git config --local user.email hollowbot@hollowverse.com',
+      `git checkout -b ${branchName}`,
+      async () => {
+        await bluebird.map(
+          Object.entries(filesToAdd),
+          async ([fileName, contents]) => {
+            await writeFile(join(repoPath, fileName), contents);
+          },
+        );
+      },
+      `git add ${Object.keys(filesToAdd).join(' ')}`,
+      `git commit -m 'Update report file with results from ${dateStr}'`,
+    ]);
 
     if (process.env.PUSH === 'true') {
-      const repoPath = tmp.dirSync().name;
-      const branchName = `report-${dateStr}`;
-      const filesToAdd = {
-        'mostRecent.md': markdownReport,
-      };
-
-      await executeCommands([
-        async () => {
-          if (process.env.AWS === 'true') {
-            await initGit();
-            shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
-          }
-        },
-        () => {
-          shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
-          shelljs.env.GIT_SSH_COMMAND =
-            'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
-        },
-        'chmod 600 /tmp/privateKey',
-        `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
-        () => {
-          shelljs.cd(repoPath);
-        },
-        'git config --local user.name hollowbot',
-        'git config --local user.email hollowbot@hollowverse.com',
-        `git checkout -b ${branchName}`,
-        async () => {
-          await bluebird.map(
-            Object.entries(filesToAdd),
-            async ([fileName, contents]) => {
-              await writeFile(join(repoPath, fileName), contents);
-            },
-          );
-        },
-        `git add ${Object.keys(filesToAdd).join(' ')}`,
-        `git commit -m 'Update report file with results from ${dateStr}'`,
-      ]);
-
       await executeCommand(`git push origin -u ${branchName} --force`);
 
       const octokit = new Octokit();
