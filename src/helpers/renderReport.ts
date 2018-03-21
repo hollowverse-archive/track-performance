@@ -13,7 +13,7 @@ export const renderReport = ({
       let body: string;
 
       if ('error' in report) {
-        body = `Failed to run this test: ${report.error.message}`;
+        body = `Failed to run this reporter: ${report.error.message}`;
       } else {
         body = source`
           Test | First View | Repeat View
