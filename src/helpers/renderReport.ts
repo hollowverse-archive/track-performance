@@ -10,16 +10,26 @@ export const renderReport = ({
 }: GeneratedAggregatedReportOptions) => stripIndents`
   ${source`
     ${reports.map(report => {
+      let body: string;
+
+      if ('error' in report) {
+        body = `Failed to run this test: ${report.error.message}`;
+      } else {
+        body = source`
+          Test | First View | Repeat View
+          -----|------------|-------------
+          ${report.records.map(({ name, scores, formatScore }) => {
+            return `${name} | ${formatScore(scores.firstView)} | ${formatScore(
+              scores.repeatView,
+            )}`;
+          })}
+      `;
+      }
+
       return `\n${source`
         ### ${report.url ? `[${report.name}](${report.url})` : report.name}
 
-        Test | First View | Repeat View
-        -----|------------|-------------
-        ${report.records.map(({ name, scores, formatScore }) => {
-          return `${name} | ${formatScore(scores.firstView)} | ${formatScore(
-            scores.repeatView,
-          )}`;
-        })}
+        ${body}
       `}`;
     })}
   `}

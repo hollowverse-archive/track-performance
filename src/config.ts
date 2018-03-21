@@ -10,6 +10,9 @@ export const config = {
   github: {
     token: process.env.GITHUB_TOKEN,
   },
+  google: {
+    apiKey: process.env.GOOGLE_API_KEY,
+  },
 };
 
 export type GlobalConfig = typeof config;
