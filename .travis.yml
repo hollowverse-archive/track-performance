@@ -13,6 +13,7 @@ script:
     -e ENC_PASS_WPT
     -e ENC_PASS_GITHUB
     -e ENC_PASS_SSH_PRIVATE_KEY
+    -e ENC_PASS_GOOGLE
     hollowverse/build-env:lambda
 
 notifications:
