@@ -1,4 +1,4 @@
-service: perf-monitor
+service: track-performance
 
 plugins:
   - serverless-webpack
@@ -6,7 +6,7 @@ plugins:
 custom:
   webpack:
     webpackConfig: webpack.config.ts
-    packager: 'yarn'
+    packager: yarn
     includeModules: true # Enable auto-packing of external modules
 
 provider:
@@ -22,8 +22,8 @@ provider:
     GOOGLE_API_KEY: ${file(./secrets/google.json):apiKey}
 
 functions:
-  runReporters:
-    handler: src/runReporters.runReporters
+  reportPerformance:
+    handler: src/reportPerformance.reportPerformance
     events:
       - schedule:
           rate: rate(24 hours)

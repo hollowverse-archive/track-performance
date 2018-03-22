@@ -21,7 +21,7 @@ import { retryCommand } from '@hollowverse/common/helpers/retryCommand';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
-export const runReporters: Handler = async (_event, _context, done) => {
+export const reportPerformance: Handler = async (_event, _context, done) => {
   try {
     const urls = [
       'https://hollowverse.com',

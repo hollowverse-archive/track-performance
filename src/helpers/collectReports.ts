@@ -20,14 +20,23 @@ export const collectReports = async ({
   reporters,
   config,
   concurrency = 3,
-}: CollectReportsOptions): Promise<Report[]> => {
+}: CollectReportsOptions) => {
   return flatten(
     await bluebird.map(
       reporters,
-      async ReporterClass => {
-        const r = new ReporterClass(url, config);
+      async (ReporterClass): Promise<Report[]> => {
+        try {
+          const r = new ReporterClass(url, config);
 
-        return r.getReports();
+          return r.getReports();
+        } catch (error) {
+          return [
+            {
+              name: ReporterClass.name,
+              error,
+            },
+          ];
+        }
       },
       { concurrency },
     ),
