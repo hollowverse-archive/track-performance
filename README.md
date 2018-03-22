@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/hollowverse/track-performance.svg?branch=master)](https://travis-ci.org/hollowverse/track-performance)
+# `track-performance` [![Build Status](https://travis-ci.org/hollowverse/track-performance.svg?branch=master)](https://travis-ci.org/hollowverse/track-performance)
 
-`track-performance` is an AWS Lambda function that tracks the performance of hollowverse.com.
+An AWS Lambda function that tracks the performance of hollowverse.com.
 
 Every day, the function runs a set of "reporters", each reporter communicates with a particular performance testing service. Some of the services used currently include:
 
