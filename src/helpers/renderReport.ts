@@ -16,7 +16,7 @@ export const renderReport = ({
         body = `Failed to run this reporter: ${report.error.message}`;
       } else {
         body = source`
-          ${report.testName || 'Name'} | ${report.scoreNames.join(' | ')}
+          ${report.testName || 'Test'} | ${report.scoreNames.join(' | ')}
           -----| ${Array(report.scoreNames.length)
             .fill('-------------')
             .join('|')}
