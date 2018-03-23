@@ -28,7 +28,7 @@
     "@babel/runtime": "^7.0.0-beta.41",
     "@hollowverse/common": "^3.2.7",
     "@octokit/rest": "^14.0.9",
-    "aws-sdk": "^2.197.0",
+    "aws-sdk": "^2.212.1",
     "bluebird": "^3.5.1",
     "common-tags": "^1.7.2",
     "date-fns": "^1.29.0",

@@ -20,6 +20,16 @@ provider:
     GITHUB_TOKEN: ${file(./secrets/github.json):token}
     WPT_API_KEY: ${file(./secrets/webpagetest.json):apiKey}
     GOOGLE_API_KEY: ${file(./secrets/google.json):apiKey}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - elasticbeanstalk:DescribeEnvironments
+        - elasticbeanstalk:DescribeEvents
+        - elasticbeanstalk:DescribeApplicationVersions
+        - elasticbeanstalk:DescribeInstancesHealth
+        - elasticbeanstalk:DescribeEnvironmentHealth
+        - elasticbeanstalk:DescribeApplications
+      Resource: "*"
 
 functions:
   reportPerformance:

@@ -21,12 +21,12 @@ export class SecurityHeadersReporter implements Reporter {
     return [
       {
         name: 'Security Headers',
+        testName: 'URL',
+        scoreNames: ['Grade'],
         records: [
           {
-            name: 'Grade',
-            scores: {
-              firstView: response.headers['x-grade'] as string,
-            },
+            name: this.url,
+            scores: [response.headers['x-grade'] as string],
             formatScore: defaultFormat,
           },
         ],

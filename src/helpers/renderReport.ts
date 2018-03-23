@@ -13,15 +13,15 @@ export const renderReport = ({
       let body: string;
 
       if ('error' in report) {
-        body = `Failed to run this test: ${report.error.message}`;
+        body = `Failed to run this reporter: ${report.error.message}`;
       } else {
         body = source`
-          Test | First View | Repeat View
-          -----|------------|-------------
+          ${report.testName || 'Test'} | ${report.scoreNames.join(' | ')}
+          -----| ${Array(report.scoreNames.length)
+            .fill('-------------')
+            .join('|')}
           ${report.records.map(({ name, scores, formatScore }) => {
-            return `${name} | ${formatScore(scores.firstView)} | ${formatScore(
-              scores.repeatView,
-            )}`;
+            return `${name} | ${scores.map(formatScore).join(' | ')}`;
           })}
       `;
       }

@@ -90,17 +90,17 @@ export class MobileFriendlinessReporter implements Reporter {
     return [
       {
         name: 'Mobile Friendliness',
+        scoreNames: ['Status'],
         records: [
           {
             name: 'Is page mobile friendly?',
-            scores: {
-              firstView:
-                body.mobileFriendliness === 'MOBILE_FRIENDLY'
-                  ? true
-                  : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
-                    ? false
-                    : null,
-            },
+            scores: [
+              body.mobileFriendliness === 'MOBILE_FRIENDLY'
+                ? true
+                : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
+                  ? false
+                  : null,
+            ],
             formatScore: formatYesOrNo,
           },
           ...Object.keys(ruleKeyToRuleDescription).map(rule => {
@@ -111,9 +111,7 @@ export class MobileFriendlinessReporter implements Reporter {
 
             return {
               name: ruleKeyToRuleDescription[rule as Rule],
-              scores: {
-                firstView: hasPassed,
-              },
+              scores: [hasPassed],
               formatScore: formatHasPassed,
             };
           }),

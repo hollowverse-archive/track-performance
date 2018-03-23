@@ -5,9 +5,6 @@ import prettier from 'prettier';
 import shelljs from 'shelljs';
 import tmp from 'tmp';
 import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
-import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-import { WebPageTestReporter } from './reporters/WebPageTestReporter';
-import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { collectReports } from './helpers/collectReports';
 import { config } from './config';
 import { format as formatDate } from 'date-fns';
@@ -18,6 +15,10 @@ import { writeFile } from './helpers/writeFile';
 import { executeCommand } from '@hollowverse/common/helpers/executeCommand';
 import { executeCommands } from '@hollowverse/common/helpers/executeCommands';
 import { retryCommand } from '@hollowverse/common/helpers/retryCommand';
+import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
+import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
+import { AwsHealthReporter } from './reporters/AwsHealthReporter';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
@@ -37,6 +38,7 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
           SecurityHeadersReporter,
           WebPageTestReporter,
           MobileFriendlinessReporter,
+          AwsHealthReporter,
         ],
       });
 
@@ -67,46 +69,47 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
 
     markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
 
-    const repoPath = tmp.dirSync().name;
-    const branchName = `report-${dateStr}`;
-    const filesToAdd = {
-      'mostRecent.md': markdownReport,
-    };
+    if (process.env.NODE_ENV === 'local') {
+      console.info(markdownReport);
+    } else if (config.shouldPush) {
+      const repoPath = tmp.dirSync().name;
+      const branchName = `report-${dateStr}`;
+      const filesToAdd = {
+        'mostRecent.md': markdownReport,
+      };
 
-    await executeCommands([
-      async () => {
-        if (config.shouldInstallGit) {
-          await initGit();
-          shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
-        }
-      },
-      () => {
-        shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
-        shelljs.env.GIT_SSH_COMMAND =
-          'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
-      },
-      'chmod 600 /tmp/privateKey',
-      `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
-      () => {
-        shelljs.cd(repoPath);
-      },
-      'git config --local user.name hollowbot',
-      'git config --local user.email hollowbot@hollowverse.com',
-      `git checkout -b ${branchName}`,
-      async () => {
-        await bluebird.map(
-          Object.entries(filesToAdd),
-          async ([fileName, contents]) => {
-            await writeFile(join(repoPath, fileName), contents);
-          },
-        );
-      },
-      `git add ${Object.keys(filesToAdd).join(' ')}`,
-      `git commit -m 'Update report file with results from ${dateStr}'`,
-    ]);
-
-    if (config.shouldPush === true) {
-      await executeCommand(`git push origin -u ${branchName} --force`);
+      await executeCommands([
+        async () => {
+          if (config.shouldInstallGit) {
+            await initGit();
+            shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
+          }
+        },
+        () => {
+          shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
+          shelljs.env.GIT_SSH_COMMAND =
+            'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
+        },
+        'chmod 600 /tmp/privateKey',
+        `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
+        () => {
+          shelljs.cd(repoPath);
+        },
+        'git config --local user.name hollowbot',
+        'git config --local user.email hollowbot@hollowverse.com',
+        `git checkout -b ${branchName}`,
+        async () => {
+          await bluebird.map(
+            Object.entries(filesToAdd),
+            async ([fileName, contents]) => {
+              await writeFile(join(repoPath, fileName), contents);
+            },
+          );
+        },
+        `git add ${Object.keys(filesToAdd).join(' ')}`,
+        `git commit -m 'Update report file with results from ${dateStr}'`,
+        `git push origin -u ${branchName} --force`,
+      ]);
 
       const octokit = new Octokit();
 
@@ -150,9 +153,10 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
       } catch (error) {
         console.error(`Failed to merge PR ${number}: ${error.message}`);
       }
-
-      done(null, 'Pull request created');
+      console.info('Pull request created');
     }
+
+    done(null);
   } catch (error) {
     done(error);
   }
