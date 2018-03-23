@@ -15,9 +15,9 @@ import { writeFile } from './helpers/writeFile';
 import { executeCommand } from '@hollowverse/common/helpers/executeCommand';
 import { executeCommands } from '@hollowverse/common/helpers/executeCommands';
 import { retryCommand } from '@hollowverse/common/helpers/retryCommand';
-// import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-// import { WebPageTestReporter } from './reporters/WebPageTestReporter';
-// import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
+import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
+import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { AwsHealthReporter } from './reporters/AwsHealthReporter';
 
 // tslint:disable no-console
@@ -35,9 +35,9 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
         url,
         config,
         reporters: [
-          // SecurityHeadersReporter,
-          // WebPageTestReporter,
-          // MobileFriendlinessReporter,
+          SecurityHeadersReporter,
+          WebPageTestReporter,
+          MobileFriendlinessReporter,
           AwsHealthReporter,
         ],
       });
@@ -71,50 +71,50 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
 
     if (process.env.NODE_ENV === 'local') {
       console.info(markdownReport);
+      done(null);
 
       return;
     }
 
-    const repoPath = tmp.dirSync().name;
-    const branchName = `report-${dateStr}`;
-    const filesToAdd = {
-      'mostRecent.md': markdownReport,
-    };
+    if (config.shouldPush) {
+      const repoPath = tmp.dirSync().name;
+      const branchName = `report-${dateStr}`;
+      const filesToAdd = {
+        'mostRecent.md': markdownReport,
+      };
 
-    await executeCommands([
-      async () => {
-        if (config.shouldInstallGit) {
-          await initGit();
-          shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
-        }
-      },
-      () => {
-        shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
-        shelljs.env.GIT_SSH_COMMAND =
-          'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
-      },
-      'chmod 600 /tmp/privateKey',
-      `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
-      () => {
-        shelljs.cd(repoPath);
-      },
-      'git config --local user.name hollowbot',
-      'git config --local user.email hollowbot@hollowverse.com',
-      `git checkout -b ${branchName}`,
-      async () => {
-        await bluebird.map(
-          Object.entries(filesToAdd),
-          async ([fileName, contents]) => {
-            await writeFile(join(repoPath, fileName), contents);
-          },
-        );
-      },
-      `git add ${Object.keys(filesToAdd).join(' ')}`,
-      `git commit -m 'Update report file with results from ${dateStr}'`,
-    ]);
-
-    if (config.shouldPush === true) {
-      await executeCommand(`git push origin -u ${branchName} --force`);
+      await executeCommands([
+        async () => {
+          if (config.shouldInstallGit) {
+            await initGit();
+            shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
+          }
+        },
+        () => {
+          shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
+          shelljs.env.GIT_SSH_COMMAND =
+            'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
+        },
+        'chmod 600 /tmp/privateKey',
+        `git clone git@github.com:hollowverse/perf-reports.git ${repoPath}`,
+        () => {
+          shelljs.cd(repoPath);
+        },
+        'git config --local user.name hollowbot',
+        'git config --local user.email hollowbot@hollowverse.com',
+        `git checkout -b ${branchName}`,
+        async () => {
+          await bluebird.map(
+            Object.entries(filesToAdd),
+            async ([fileName, contents]) => {
+              await writeFile(join(repoPath, fileName), contents);
+            },
+          );
+        },
+        `git add ${Object.keys(filesToAdd).join(' ')}`,
+        `git commit -m 'Update report file with results from ${dateStr}'`,
+        `git push origin -u ${branchName} --force`,
+      ]);
 
       const octokit = new Octokit();
 

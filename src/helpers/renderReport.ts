@@ -16,12 +16,12 @@ export const renderReport = ({
         body = `Failed to run this reporter: ${report.error.message}`;
       } else {
         body = source`
-          Test | First View | Repeat View
-          -----|------------|-------------
+          ${report.testName || 'Name'} | ${report.scoreNames.join(' | ')}
+          -----| ${Array(report.scoreNames.length)
+            .fill('-------------')
+            .join('|')}
           ${report.records.map(({ name, scores, formatScore }) => {
-            return `${name} | ${formatScore(scores.firstView)} | ${formatScore(
-              scores.repeatView,
-            )}`;
+            return `${name} | ${scores.map(formatScore).join(' | ')}`;
           })}
       `;
       }
