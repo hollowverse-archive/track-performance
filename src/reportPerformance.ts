@@ -21,7 +21,7 @@ import { retryCommand } from '@hollowverse/common/helpers/retryCommand';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
-export const runReporters: Handler = async (_event, _context, done) => {
+export const reportPerformance: Handler = async (_event, _context, done) => {
   try {
     const urls = [
       'https://hollowverse.com',
@@ -75,7 +75,7 @@ export const runReporters: Handler = async (_event, _context, done) => {
 
     await executeCommands([
       async () => {
-        if (process.env.AWS === 'true') {
+        if (config.shouldInstallGit) {
           await initGit();
           shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
         }
@@ -105,7 +105,7 @@ export const runReporters: Handler = async (_event, _context, done) => {
       `git commit -m 'Update report file with results from ${dateStr}'`,
     ]);
 
-    if (process.env.PUSH === 'true') {
+    if (config.shouldPush === true) {
       await executeCommand(`git push origin -u ${branchName} --force`);
 
       const octokit = new Octokit();
