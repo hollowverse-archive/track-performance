@@ -4,6 +4,8 @@ const sshPrivateKeyPath = join(process.cwd(), 'secrets/sshPrivateKey');
 
 export const config = {
   sshPrivateKeyPath,
+  shouldPush: process.env.NODE_ENV === 'production',
+  shouldInstallGit: process.env.NODE_ENV !== 'local',
   webpagetest: {
     apiKey: process.env.WPT_API_KEY,
   },
