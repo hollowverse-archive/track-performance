@@ -71,12 +71,7 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
 
     if (process.env.NODE_ENV === 'local') {
       console.info(markdownReport);
-      done(null);
-
-      return;
-    }
-
-    if (config.shouldPush) {
+    } else if (config.shouldPush) {
       const repoPath = tmp.dirSync().name;
       const branchName = `report-${dateStr}`;
       const filesToAdd = {
@@ -158,9 +153,10 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
       } catch (error) {
         console.error(`Failed to merge PR ${number}: ${error.message}`);
       }
-
-      done(null, 'Pull request created');
+      console.info('Pull request created');
     }
+
+    done(null);
   } catch (error) {
     done(error);
   }
