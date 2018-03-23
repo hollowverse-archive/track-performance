@@ -5,9 +5,6 @@ import prettier from 'prettier';
 import shelljs from 'shelljs';
 import tmp from 'tmp';
 import { Handler } from 'aws-lambda'; // tslint:disable-line:no-implicit-dependencies
-import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-import { WebPageTestReporter } from './reporters/WebPageTestReporter';
-import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { collectReports } from './helpers/collectReports';
 import { config } from './config';
 import { format as formatDate } from 'date-fns';
@@ -18,6 +15,10 @@ import { writeFile } from './helpers/writeFile';
 import { executeCommand } from '@hollowverse/common/helpers/executeCommand';
 import { executeCommands } from '@hollowverse/common/helpers/executeCommands';
 import { retryCommand } from '@hollowverse/common/helpers/retryCommand';
+// import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
+// import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+// import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
+import { AwsHealthReporter } from './reporters/AwsHealthReporter';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
@@ -34,9 +35,10 @@ export const runReporters: Handler = async (_event, _context, done) => {
         url,
         config,
         reporters: [
-          SecurityHeadersReporter,
-          WebPageTestReporter,
-          MobileFriendlinessReporter,
+          // SecurityHeadersReporter,
+          // WebPageTestReporter,
+          // MobileFriendlinessReporter,
+          AwsHealthReporter,
         ],
       });
 
@@ -66,6 +68,12 @@ export const runReporters: Handler = async (_event, _context, done) => {
     `;
 
     markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
+
+    if (process.env.NODE_ENV === 'local') {
+      console.info(markdownReport);
+
+      return;
+    }
 
     const repoPath = tmp.dirSync().name;
     const branchName = `report-${dateStr}`;
