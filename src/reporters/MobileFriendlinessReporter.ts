@@ -71,63 +71,54 @@ export class MobileFriendlinessReporter implements Reporter {
   }
 
   async getReports(): Promise<Report[]> {
-    try {
-      const response = await got.post(
-        'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run',
-        {
-          json: true,
-          query: {
-            key: this.key,
-          },
-          body: {
-            url: this.url,
-            requestScreenshot: false,
-          },
+    const response = await got.post(
+      'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run',
+      {
+        json: true,
+        query: {
+          key: this.key,
         },
-      );
+        body: {
+          url: this.url,
+          requestScreenshot: false,
+        },
+      },
+    );
 
-      const body = response.body as GoogleMobileFriendlinessTestResponse;
+    const body = response.body as GoogleMobileFriendlinessTestResponse;
 
-      return [
-        {
-          name: 'Mobile Friendliness',
-          records: [
-            {
-              name: 'Is page mobile friendly?',
-              scores: {
-                firstView:
-                  body.mobileFriendliness === 'MOBILE_FRIENDLY'
-                    ? true
-                    : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
-                      ? false
-                      : null,
-              },
-              formatScore: formatYesOrNo,
+    return [
+      {
+        name: 'Mobile Friendliness',
+        records: [
+          {
+            name: 'Is page mobile friendly?',
+            scores: {
+              firstView:
+                body.mobileFriendliness === 'MOBILE_FRIENDLY'
+                  ? true
+                  : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
+                    ? false
+                    : null,
             },
-            ...Object.keys(ruleKeyToRuleDescription).map(rule => {
-              const hasPassed = !find(
-                body.mobileFriendlyIssues,
-                issue => issue.rule === rule,
-              );
+            formatScore: formatYesOrNo,
+          },
+          ...Object.keys(ruleKeyToRuleDescription).map(rule => {
+            const hasPassed = !find(
+              body.mobileFriendlyIssues,
+              issue => issue.rule === rule,
+            );
 
-              return {
-                name: ruleKeyToRuleDescription[rule as Rule],
-                scores: {
-                  firstView: hasPassed,
-                },
-                formatScore: formatHasPassed,
-              };
-            }),
-          ],
-        },
-      ];
-    } catch (error) {
-      return [
-        {
-          name: 'Mobile Friendliness',
-          error,
-        },
-      ];
-    }
+            return {
+              name: ruleKeyToRuleDescription[rule as Rule],
+              scores: {
+                firstView: hasPassed,
+              },
+              formatScore: formatHasPassed,
+            };
+          }),
+        ],
+      },
+    ];
   }
 }
