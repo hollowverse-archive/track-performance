@@ -1,17 +1,15 @@
 import { GenericReporter, Report } from '../typings/reporter';
 import awsSdk from 'aws-sdk';
 
-const formatAwsHealth = (color: 'Green' | 'Red' | 'Yellow' | 'Grey') => {
-  switch (color) {
-    case 'Green':
-      return ':heavy_check_mark: OK';
-    case 'Red':
-      return ':red_circle: Error';
-    case 'Yellow':
-      return ':warning: Warning';
-    default:
-      return ':grey_question: Unknown';
-  }
+const awsColorsToFormattedColors: Record<string, string> = {
+  Green: ':heavy_check_mark: Green',
+  Red: ':red_circle: Red',
+  Yellow: ':warning: Yellow',
+  Grey: ':grey_question: Unknown',
+};
+
+const formatAwsHealth = (color: string) => {
+  return awsColorsToFormattedColors[color] || awsColorsToFormattedColors.Grey;
 };
 
 export class AwsHealthReporter implements GenericReporter {
@@ -38,7 +36,9 @@ export class AwsHealthReporter implements GenericReporter {
 
     return [
       {
-        name: 'Elastic Beanstalk',
+        name: 'Elastic Beanstalk Health',
+        url:
+          'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/health-enhanced-status.html',
         testName: 'Environment',
         scoreNames: ['Health'],
         records: Environments.map(env => ({
