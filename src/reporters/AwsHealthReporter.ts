@@ -5,10 +5,11 @@ const awsColorsToFormattedColors: Record<string, string> = {
   Green: ':heavy_check_mark: Green',
   Red: ':red_circle: Red',
   Yellow: ':warning: Yellow',
+  Grey: ':grey_question: Unknown',
 };
 
 const formatAwsHealth = (color: string) => {
-  return awsColorsToFormattedColors[color] || ':grey_question: Unknown';
+  return awsColorsToFormattedColors[color] || awsColorsToFormattedColors.Grey;
 };
 
 export class AwsHealthReporter implements GenericReporter {
