@@ -1,5 +1,5 @@
 import got from 'got';
-import { Reporter, Report } from '../typings/reporter';
+import { PageReporter, Report } from '../typings/reporter';
 import { formatHasPassed, formatYesOrNo } from '../helpers/format';
 import { find } from 'lodash';
 import { GlobalConfig } from '../config';
@@ -56,7 +56,7 @@ type GoogleMobileFriendlinessTestResponse = {
   };
 };
 
-export class MobileFriendlinessReporter implements Reporter {
+export class MobileFriendlinessReporter implements PageReporter {
   private url: string;
   private key: string;
 
