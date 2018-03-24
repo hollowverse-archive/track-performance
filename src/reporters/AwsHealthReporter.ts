@@ -1,17 +1,14 @@
 import { GenericReporter, Report } from '../typings/reporter';
 import awsSdk from 'aws-sdk';
 
-const formatAwsHealth = (color: 'Green' | 'Red' | 'Yellow' | 'Grey') => {
-  switch (color) {
-    case 'Green':
-      return ':heavy_check_mark: Green';
-    case 'Red':
-      return ':red_circle: Red';
-    case 'Yellow':
-      return ':warning: Yellow';
-    default:
-      return ':grey_question: Unknown';
-  }
+const awsColorsToFormattedColors: Record<string, string> = {
+  Green: ':heavy_check_mark: Green',
+  Red: ':red_circle: Red',
+  Yellow: ':warning: Yellow',
+};
+
+const formatAwsHealth = (color: string) => {
+  return awsColorsToFormattedColors[color] || ':grey_question: Unknown';
 };
 
 export class AwsHealthReporter implements GenericReporter {
