@@ -38,7 +38,9 @@ export class AwsHealthReporter implements GenericReporter {
 
     return [
       {
-        name: 'Elastic Beanstalk',
+        name: 'Elastic Beanstalk Health',
+        url:
+          'https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/health-enhanced-status.html',
         testName: 'Environment',
         scoreNames: ['Health'],
         records: Environments.map(env => ({
