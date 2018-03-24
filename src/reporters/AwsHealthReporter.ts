@@ -4,11 +4,11 @@ import awsSdk from 'aws-sdk';
 const formatAwsHealth = (color: 'Green' | 'Red' | 'Yellow' | 'Grey') => {
   switch (color) {
     case 'Green':
-      return ':heavy_check_mark: OK';
+      return ':heavy_check_mark: Green';
     case 'Red':
-      return ':red_circle: Error';
+      return ':red_circle: Red';
     case 'Yellow':
-      return ':warning: Warning';
+      return ':warning: Yellow';
     default:
       return ':grey_question: Unknown';
   }
