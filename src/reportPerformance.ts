@@ -19,6 +19,7 @@ import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { AwsHealthReporter } from './reporters/AwsHealthReporter';
+import { GenericReporterClass, PageReporterClass } from './typings/reporter';
 
 // tslint:disable no-console
 // tslint:disable-next-line:max-func-body-length
@@ -30,41 +31,53 @@ export const reportPerformance: Handler = async (_event, _context, done) => {
     ];
     const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
 
-    const results = await bluebird.map(urls, async url => {
-      const reports = await collectReports({
-        url,
-        config,
-        reporters: [
-          SecurityHeadersReporter,
-          WebPageTestReporter,
-          MobileFriendlinessReporter,
-          AwsHealthReporter,
-        ],
-      });
+    const pageReporters: PageReporterClass[] = [
+      SecurityHeadersReporter,
+      MobileFriendlinessReporter,
+      WebPageTestReporter,
+    ];
 
-      return {
-        url,
-        raw: reports,
-        rendered: renderReport({
-          reports,
-        }),
-      };
+    const genericReporters: GenericReporterClass[] = [AwsHealthReporter];
+
+    const pageReportsPromise = bluebird.map(urls, async url => ({
+      url,
+      reports: await collectReports({
+        reporters: pageReporters.map(ReporterClass => ({
+          name: ReporterClass.name,
+          instance: new ReporterClass(url, config),
+        })),
+      }),
+    }));
+
+    const genericReportersPromise = collectReports({
+      reporters: genericReporters.map(ReporterClass => ({
+        name: ReporterClass.name,
+        instance: new ReporterClass(config),
+      })),
     });
+
+    const genericReports = await genericReportersPromise;
+    const pageReports = await pageReportsPromise;
 
     let markdownReport = stripIndents`
       Report for tests performed on ${dateStr}
       ========================================
 
-      ${results
-        .map(({ url, rendered }) => {
-          return stripIndents`
-            [${url}](${url})
-            ------------------------------
+      ${pageReports
+        .map(
+          ({ url, reports }) => `
+        ## ${url}
 
-            ${rendered}
-        `;
-        })
-        .join('\n'.repeat(3))}
+        ${reports
+          .map(report => renderReport(report, { headingLevel: 3 }))
+          .join('\n'.repeat(2))}
+      `,
+        )
+        .join('\n'.repeat(2))}
+
+      ${genericReports
+        .map(report => renderReport(report, { headingLevel: 2 }))
+        .join('\n'.repeat(2))}
     `;
 
     markdownReport = prettier.format(markdownReport, { parser: 'markdown' });

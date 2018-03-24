@@ -1,8 +1,8 @@
 import got from 'got';
-import { Reporter, Report } from '../typings/reporter';
+import { PageReporter, Report } from '../typings/reporter';
 import { defaultFormat } from '../helpers/format';
 
-export class SecurityHeadersReporter implements Reporter {
+export class SecurityHeadersReporter implements PageReporter {
   private url: string;
 
   constructor(url: string) {

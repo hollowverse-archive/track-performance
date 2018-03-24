@@ -24,7 +24,21 @@ export type Report = {
       scoreNames: string[];
     });
 
-export declare class Reporter {
+export declare class PageReporter {
   constructor(url: string, config?: Pick<GlobalConfig, keyof GlobalConfig>);
   getReports(): Promise<Report[]>;
 }
+
+export type PageReporterClass = new (
+  url: string,
+  config?: Pick<GlobalConfig, keyof GlobalConfig>,
+) => PageReporter;
+
+export declare class GenericReporter {
+  constructor(config?: Pick<GlobalConfig, keyof GlobalConfig>);
+  getReports(): Promise<Report[]>;
+}
+
+export type GenericReporterClass = new (
+  config?: Pick<GlobalConfig, keyof GlobalConfig>,
+) => GenericReporter;

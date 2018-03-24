@@ -23,10 +23,10 @@ export const formatBytesAsKibibytes = flow(
 
 export const formatHasPassed = (hasPassed?: boolean) =>
   hasPassed === true
-    ? 'Passed :heavy_check_mark:'
-    : hasPassed === false ? 'Failed ❌' : defaultFormat(undefined);
+    ? ':heavy_check_mark: Passed'
+    : hasPassed === false ? '❌ Failed' : defaultFormat(undefined);
 
 export const formatYesOrNo = (result?: boolean | null) =>
   result === true
-    ? 'Yes :heavy_check_mark:'
-    : result === false ? 'No ❌' : defaultFormat(undefined);
+    ? ':heavy_check_mark: Yes'
+    : result === false ? '❌ No' : defaultFormat(undefined);

@@ -1,4 +1,4 @@
-import { Reporter, Report } from '../typings/reporter';
+import { GenericReporter, Report } from '../typings/reporter';
 import awsSdk from 'aws-sdk';
 
 const formatAwsHealth = (color: 'Green' | 'Red' | 'Yellow' | 'Grey') => {
@@ -14,10 +14,10 @@ const formatAwsHealth = (color: 'Green' | 'Red' | 'Yellow' | 'Grey') => {
   }
 };
 
-export class AwsHealthReporter implements Reporter {
+export class AwsHealthReporter implements GenericReporter {
   private eb: AWS.ElasticBeanstalk;
 
-  constructor(_url: string) {
+  constructor() {
     this.eb = new awsSdk.ElasticBeanstalk({
       apiVersion: '2010-12-01',
     });

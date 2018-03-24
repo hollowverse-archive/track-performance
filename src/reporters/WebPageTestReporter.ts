@@ -1,4 +1,4 @@
-import { Reporter, Report, TestRecord } from '../typings/reporter';
+import { PageReporter, Report, TestRecord } from '../typings/reporter';
 
 import WebPageTest, { TestResults, RunTestResponse } from 'webpagetest';
 import bluebird from 'bluebird';
@@ -21,7 +21,7 @@ import {
 } from '../helpers/format';
 import { GlobalConfig } from '../config';
 
-export class WebPageTestReporter implements Reporter {
+export class WebPageTestReporter implements PageReporter {
   // tslint:disable-next-line:no-multiline-string
   static customUserAgent = oneLine`
     Mozilla/5.0 (Linux;
