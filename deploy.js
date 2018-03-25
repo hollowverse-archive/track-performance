@@ -3,12 +3,10 @@
 /* eslint-disable no-console */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 const shelljs = require('shelljs');
-const {
-  decryptSecrets,
-} = require('@hollowverse/common/helpers/decryptSecrets');
+const { decryptSecrets } = require('@hollowverse/utils/helpers/decryptSecrets');
 const {
   executeCommands,
-} = require('@hollowverse/common/helpers/executeCommands');
+} = require('@hollowverse/utils/helpers/executeCommands');
 
 const {
   ENC_PASS_GITHUB,
