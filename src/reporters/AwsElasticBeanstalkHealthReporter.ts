@@ -12,7 +12,7 @@ const formatAwsHealth = (color: string) => {
   return awsColorsToFormattedColors[color] || awsColorsToFormattedColors.Grey;
 };
 
-export class AwsHealthReporter implements GenericReporter {
+export class AwsElasticBeanstalkHealthReporter implements GenericReporter {
   private eb: AWS.ElasticBeanstalk;
 
   constructor() {
