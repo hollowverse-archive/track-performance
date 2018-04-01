@@ -75,7 +75,7 @@ export class AwsLambdaHealthReporter implements GenericReporter {
       {
         name: 'AWS Lambda Health',
         testName: 'Function',
-        scoreNames: ['Number of Invocation Errors'],
+        scoreNames: ['Number of Invocation Errors (for the past 24 hours)'],
         records,
       },
     ];
