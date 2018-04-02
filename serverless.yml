@@ -30,6 +30,14 @@ provider:
         - elasticbeanstalk:DescribeEnvironmentHealth
         - elasticbeanstalk:DescribeApplications
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - lambda:ListFunctions
+        - lambda:ListVersionsByFunction
+        - lambda:ListAliases
+        - cloudwatch:GetMetricStatistics
+        - cloudwatch:GetMetricData
+      Resource: "*"
 
 functions:
   reportPerformance:
