@@ -11,7 +11,6 @@ import { join } from 'path';
 import { renderReport } from './helpers/renderReport';
 import { stripIndents } from 'common-tags';
 import { writeFile } from './helpers/writeFile';
-import { createLambdaHandler } from '@hollowverse/utils/helpers/createLambdaHandler';
 import { executeCommand } from '@hollowverse/utils/helpers/executeCommand';
 import { executeCommands } from '@hollowverse/utils/helpers/executeCommands';
 import { retryCommand } from '@hollowverse/utils/helpers/retryCommand';
@@ -23,7 +22,7 @@ import { AwsLambdaHealthReporter } from './reporters/AwsLambdaHealthReporter';
 import { GenericReporterClass, PageReporterClass } from './typings/reporter';
 
 // tslint:disable no-console max-func-body-length
-export const reportPerformance = createLambdaHandler(async () => {
+export const reportPerformance = async () => {
   const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
   const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
 
@@ -171,4 +170,4 @@ export const reportPerformance = createLambdaHandler(async () => {
     }
     console.info('Pull request created');
   }
-});
+};
