@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.44",
-    "@hollowverse/config": "^5.0.0",
-    "@hollowverse/utils": "^5.0.0",
+    "@hollowverse/config": "^5.0.1",
+    "@hollowverse/utils": "^5.0.1",
     "@octokit/rest": "^14.0.9",
     "aws-sdk": "^2.212.1",
     "bluebird": "^3.5.1",
