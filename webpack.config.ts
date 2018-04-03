@@ -3,7 +3,7 @@ import webpack from 'webpack';
 import slsw from 'serverless-webpack';
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
-import BabelMinifyPlugin from 'babel-minify-webpack-plugin';
+import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import { mapValues } from 'lodash';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { ifProd } from './env';
@@ -54,7 +54,12 @@ module.exports = {
         (v: any) => JSON.stringify(v),
       ),
     ),
-    ...ifProd([new BabelMinifyPlugin()]),
+    ...ifProd([
+      new UglifyJSPlugin({
+        parallel: true,
+        sourceMap: true,
+      }),
+    ]),
   ],
   externals: [nodeExternals()],
 };
