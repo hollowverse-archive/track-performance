@@ -4,7 +4,7 @@ import slsw from 'serverless-webpack';
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import { isProd } from './env';
+import { isProd } from '@hollowverse/utils/helpers/env';
 
 module.exports = {
   mode: isProd ? 'production' : 'development',
