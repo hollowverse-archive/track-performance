@@ -1,4 +1,4 @@
-import { Reporter, Report, TestRecord } from '../typings/reporter';
+import { PageReporter, Report, TestRecord } from '../typings/reporter';
 
 import WebPageTest, { TestResults, RunTestResponse } from 'webpagetest';
 import bluebird from 'bluebird';
@@ -21,7 +21,7 @@ import {
 } from '../helpers/format';
 import { GlobalConfig } from '../config';
 
-export class WebPageTestReporter implements Reporter {
+export class WebPageTestReporter implements PageReporter {
   // tslint:disable-next-line:no-multiline-string
   static customUserAgent = oneLine`
     Mozilla/5.0 (Linux;
@@ -64,10 +64,7 @@ export class WebPageTestReporter implements Reporter {
       return {
         formatScore,
         name: name,
-        scores: {
-          firstView: firstView[key],
-          repeatView: repeatView[key],
-        },
+        scores: [firstView[key], repeatView[key]],
       };
     });
   }
@@ -99,45 +96,42 @@ export class WebPageTestReporter implements Reporter {
         {
           name: 'WebPageTest',
           url: data.summary,
+          scoreNames: ['First View', 'Repeat View'],
           records: [
             {
               name: 'Number of requests',
-              scores: {
-                firstView: getNumberOfRequests(data.median.firstView),
-                repeatView: getNumberOfRequests(data.median.repeatView),
-              },
+              scores: [data.median.firstView, data.median.repeatView].map(
+                getNumberOfRequests,
+              ),
               formatScore: defaultFormat,
             },
             {
               name: 'Time to first byte',
-              scores: {
-                firstView: data.median.firstView.TTFB,
-                repeatView: data.median.repeatView.TTFB,
-              },
+              scores: [data.median.firstView.TTFB, data.median.repeatView.TTFB],
               formatScore: formatMillisecondsAsSeconds,
             },
             {
               name: 'Fully loaded',
-              scores: {
-                firstView: data.median.firstView.fullyLoaded,
-                repeatView: data.median.repeatView.fullyLoaded,
-              },
+              scores: [
+                data.median.firstView.fullyLoaded,
+                data.median.repeatView.fullyLoaded,
+              ],
               formatScore: formatMillisecondsAsSeconds,
             },
             {
               name: 'Response size',
-              scores: {
-                firstView: data.median.firstView.bytesIn,
-                repeatView: data.median.repeatView.bytesIn,
-              },
+              scores: [
+                data.median.firstView.bytesIn,
+                data.median.repeatView.bytesIn,
+              ],
               formatScore: formatBytesAsKibibytes,
             },
             {
               name: 'Response size (compressed)',
-              scores: {
-                firstView: data.median.firstView.gzip_total,
-                repeatView: data.median.repeatView.gzip_total,
-              },
+              scores: [
+                data.median.firstView.gzip_total,
+                data.median.repeatView.gzip_total,
+              ],
               formatScore: formatBytesAsKibibytes,
             },
           ],
@@ -147,6 +141,7 @@ export class WebPageTestReporter implements Reporter {
       if (hasLighthouseData(runTestResponse)) {
         reports.push({
           name: 'Lighthouse via WebPageTest',
+          scoreNames: ['First View', 'Repeat View'],
           records: WebPageTestReporter.getLighthouseRecords(
             runTestResponse.data,
           ),

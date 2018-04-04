@@ -3,16 +3,15 @@
 /* eslint-disable no-console */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 const shelljs = require('shelljs');
-const {
-  decryptSecrets,
-} = require('@hollowverse/common/helpers/decryptSecrets');
+const { decryptSecrets } = require('@hollowverse/utils/helpers/decryptSecrets');
 const {
   executeCommands,
-} = require('@hollowverse/common/helpers/executeCommands');
+} = require('@hollowverse/utils/helpers/executeCommands');
 
 const {
   ENC_PASS_GITHUB,
   ENC_PASS_WPT,
+  ENC_PASS_GOOGLE,
   ENC_PASS_SSH_PRIVATE_KEY,
   IS_PULL_REQUEST,
 } = shelljs.env;
@@ -29,6 +28,10 @@ const secrets = [
     decryptedFilename: 'webpagetest.json',
   },
   {
+    password: ENC_PASS_GOOGLE,
+    decryptedFilename: 'google.json',
+  },
+  {
     password: ENC_PASS_SSH_PRIVATE_KEY,
     decryptedFilename: 'sshPrivateKey',
   },
@@ -38,7 +41,7 @@ async function main() {
   const buildCommands = ['yarn test'];
   const deploymentCommands = [
     () => decryptSecrets(secrets, './secrets'),
-    'NODE_ENV=production yarn serverless deploy --stage production',
+    'NODE_ENV=production yarn serverless deploy --stage production --force',
   ];
 
   let isDeployment = false;

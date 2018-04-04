@@ -1,8 +1,8 @@
 import got from 'got';
-import { Reporter, Report } from '../typings/reporter';
+import { PageReporter, Report } from '../typings/reporter';
 import { defaultFormat } from '../helpers/format';
 
-export class SecurityHeadersReporter implements Reporter {
+export class SecurityHeadersReporter implements PageReporter {
   private url: string;
 
   constructor(url: string) {
@@ -21,12 +21,12 @@ export class SecurityHeadersReporter implements Reporter {
     return [
       {
         name: 'Security Headers',
+        testName: 'URL',
+        scoreNames: ['Grade'],
         records: [
           {
-            name: 'Grade',
-            scores: {
-              firstView: response.headers['x-grade'] as string,
-            },
+            name: this.url,
+            scores: [response.headers['x-grade'] as string],
             formatScore: defaultFormat,
           },
         ],

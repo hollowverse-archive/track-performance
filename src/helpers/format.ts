@@ -20,3 +20,13 @@ export const formatBytesAsKibibytes = flow(
   divideBy(1024),
   formatFixedWithUnit('KiB'),
 );
+
+export const formatHasPassed = (hasPassed?: boolean) =>
+  hasPassed === true
+    ? ':heavy_check_mark: Passed'
+    : hasPassed === false ? '❌ Failed' : defaultFormat(undefined);
+
+export const formatYesOrNo = (result?: boolean | null) =>
+  result === true
+    ? ':heavy_check_mark: Yes'
+    : result === false ? '❌ No' : defaultFormat(undefined);
