@@ -26,8 +26,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.44",
-    "@hollowverse/config": "^5.0.1",
-    "@hollowverse/utils": "^5.0.1",
+    "@hollowverse/utils": "^5.0.2",
     "@octokit/rest": "^14.0.9",
     "aws-sdk": "^2.212.1",
     "bluebird": "^3.5.1",
@@ -51,6 +50,8 @@
     "@babel/plugin-transform-runtime": "^7.0.0-beta.44",
     "@babel/polyfill": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
+    "@hollowverse/clown": "^0.0.4",
+    "@hollowverse/config": "^6.2.0",
     "@hollowverse/validate-filenames": "^1.4.0",
     "@types/bluebird": "^3.5.20",
     "@types/common-tags": "^1.4.0",
