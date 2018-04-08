@@ -8,7 +8,7 @@
   "license": "Unlicense",
   "private": true,
   "scripts": {
-    "pretest": "run-p -l --aggregate-output validate-filenames lint lint-staged 'clown check'",
+    "pretest": "run-p -l --aggregate-output common-check lint",
     "test": "run-p -l --aggregate-output check-ts",
     "check-ts/src": "tsc --project ./src --noEmit",
     "check-ts/root": "tsc --project ./ --noEmit",
@@ -23,7 +23,8 @@
     "clown": "clown",
     "pre-push": "yarn test",
     "pre-commit": "yarn pretest",
-    "tslint": "yarn lint-ts"
+    "tslint": "yarn lint-ts",
+    "common-check": "run-p -l -c --aggregate-output validate-filenames lint-staged 'clown check'"
   },
   "resolutions": {
     "babel-core": "^7.0.0-bridge.0"
@@ -53,7 +54,7 @@
     "@babel/polyfill": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
     "@hollowverse/clown": "^0.0.4",
-    "@hollowverse/config": "^6.2.0",
+    "@hollowverse/config": "^7.1.0",
     "@hollowverse/validate-filenames": "^1.4.0",
     "@types/bluebird": "^3.5.20",
     "@types/common-tags": "^1.4.0",
@@ -70,6 +71,7 @@
     "husky": "^0.15.0-rc.8",
     "lint-staged": "^7.0.0",
     "npm-run-all": "^4.0.2",
+    "prettier": "^1.10.2",
     "serverless": "^1.26.1",
     "serverless-offline": "^3.18.0",
     "serverless-webpack": "^5.1.0",
@@ -79,8 +81,7 @@
     "webpack": "^4.5.0",
     "webpack-cli": "^2.0.13",
     "webpack-node-externals": "^1.6.0",
-    "yarnhook": "^0.1.1",
-    "prettier": "^1.10.2"
+    "yarnhook": "^0.1.1"
   },
   "lint-staged": {
     "**/*.md": [
