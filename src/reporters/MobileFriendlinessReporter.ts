@@ -58,9 +58,9 @@ type GoogleMobileFriendlinessTestResponse = {
 };
 
 export class MobileFriendlinessReporter implements PageReporter {
-  static API_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
+  private static API_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
 
-  static getApiResponse = debouncePromise(
+  private static getApiResponse = debouncePromise(
     async ({ url, key }: { url: string; key: string }) =>
       got.post(MobileFriendlinessReporter.API_ENDPOINT, {
         json: true,
@@ -72,7 +72,7 @@ export class MobileFriendlinessReporter implements PageReporter {
           requestScreenshot: false,
         },
       }),
-    300,
+    1,
   );
 
   private url: string;
