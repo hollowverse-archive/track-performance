@@ -23,7 +23,7 @@ import { GlobalConfig } from '../config';
 
 export class WebPageTestReporter implements PageReporter {
   // tslint:disable-next-line:no-multiline-string
-  static customUserAgent = oneLine`
+  private static CUSTOM_USER_AGENT = oneLine`
     Mozilla/5.0 (Linux;
     Android 4.4.2; Nexus 4 Build/KOT49H)
     AppleWebKit/537.36 (KHTML, like Gecko)
@@ -79,7 +79,7 @@ export class WebPageTestReporter implements PageReporter {
           lighthouse: true,
           keepOriginalUserAgent: true,
           pollResults: 5,
-          userAgent: WebPageTestReporter.customUserAgent,
+          userAgent: WebPageTestReporter.CUSTOM_USER_AGENT,
         },
         cb,
       );

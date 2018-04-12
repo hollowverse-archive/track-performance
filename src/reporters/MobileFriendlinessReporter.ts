@@ -72,7 +72,7 @@ export class MobileFriendlinessReporter implements PageReporter {
           requestScreenshot: false,
         },
       }),
-    1,
+    200,
   );
 
   private url: string;
