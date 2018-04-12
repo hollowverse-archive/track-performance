@@ -3,6 +3,7 @@ import { PageReporter, Report } from '../typings/reporter';
 import { formatHasPassed, formatYesOrNo } from '../helpers/format';
 import { find } from 'lodash';
 import { GlobalConfig } from '../config';
+import debouncePromise from 'p-debounce';
 
 type Rule =
   | 'USES_INCOMPATIBLE_PLUGINS'
@@ -57,6 +58,23 @@ type GoogleMobileFriendlinessTestResponse = {
 };
 
 export class MobileFriendlinessReporter implements PageReporter {
+  private static API_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
+
+  private static getApiResponse = debouncePromise(
+    async ({ url, key }: { url: string; key: string }) =>
+      got.post(MobileFriendlinessReporter.API_ENDPOINT, {
+        json: true,
+        query: {
+          key,
+        },
+        body: {
+          url,
+          requestScreenshot: false,
+        },
+      }),
+    1,
+  );
+
   private url: string;
   private key: string;
 
@@ -71,19 +89,10 @@ export class MobileFriendlinessReporter implements PageReporter {
   }
 
   async getReports(): Promise<Report[]> {
-    const response = await got.post(
-      'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run',
-      {
-        json: true,
-        query: {
-          key: this.key,
-        },
-        body: {
-          url: this.url,
-          requestScreenshot: false,
-        },
-      },
-    );
+    const response = await MobileFriendlinessReporter.getApiResponse({
+      key: this.key,
+      url: this.url,
+    });
 
     const body = response.body as GoogleMobileFriendlinessTestResponse;
 
