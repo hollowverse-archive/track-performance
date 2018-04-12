@@ -23,7 +23,12 @@ import { GenericReporterClass, PageReporterClass } from './typings/reporter';
 
 // tslint:disable no-console max-func-body-length
 export const reportPerformance = async () => {
-  const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
+  const urls = [
+    'https://hollowverse.com',
+    'https://hollowverse.com/Tom_Hanks',
+    'https://dev.hollowverse.com',
+    'https://dev.hollowverse.com/Tom_Hanks',
+  ];
   const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
 
   const pageReporters: PageReporterClass[] = [
