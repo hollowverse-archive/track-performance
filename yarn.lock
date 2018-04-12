@@ -815,6 +815,10 @@
   version "6.0.102"
   resolved "http://registry.npmjs.org/@types/node/-/node-6.0.102.tgz#a6cf3b9843286b63eb362a8522bc382d96fe68d1"
 
+"@types/p-debounce@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/p-debounce/-/p-debounce-1.0.0.tgz#c7fab3d61f9bc6454337c4aef0dec069456d00ee"
+
 "@types/prettier@^1.10.0":
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-1.10.0.tgz#5abf1ec0a6e904fe2490cc2068f36a38e4a63c42"
@@ -6368,6 +6372,10 @@ p-cancelable@^0.3.0:
 p-cancelable@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-0.4.0.tgz#bcb41d35bf6097fc4367a065b6eb84b9b124eff0"
+
+p-debounce@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/p-debounce/-/p-debounce-1.0.0.tgz#cb7f2cbeefd87a09eba861e112b67527e621e2fd"
 
 p-each-series@^1.0.0:
   version "1.0.0"
