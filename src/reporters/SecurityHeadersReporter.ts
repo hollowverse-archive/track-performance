@@ -2,9 +2,10 @@ import got from 'got';
 import { PageReporter, Report } from '../typings/reporter';
 import { defaultFormat } from '../helpers/format';
 import debouncePromise from 'p-debounce';
+import { oneLine } from 'common-tags';
 
 export class SecurityHeadersReporter implements PageReporter {
-  private static API_ENDPOINT = 'https://securityheaders.io/';
+  private static API_ENDPOINT = 'https://securityheaders.com/';
 
   private static getApiResponse = debouncePromise(
     async ({ url }: { url: string }) =>
@@ -29,6 +30,20 @@ export class SecurityHeadersReporter implements PageReporter {
       url: this.url,
     });
 
+    const score = response.headers['x-grade'];
+
+    if (score === undefined) {
+      throw new TypeError(
+        'Expected securityheaders.com API call to have a header named "x-grade"',
+      );
+    } else if (Array.isArray(score)) {
+      throw new TypeError(oneLine`
+        Expected securityheaders.com API call to return exactly
+        one header named "x-grade", instead got ${score.length}
+        headers with that name.
+      `);
+    }
+
     return [
       {
         name: 'Security Headers',
@@ -37,7 +52,7 @@ export class SecurityHeadersReporter implements PageReporter {
         records: [
           {
             name: this.url,
-            scores: [response.headers['x-grade'] as string],
+            scores: [score],
             formatScore: defaultFormat,
           },
         ],
