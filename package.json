@@ -16,20 +16,21 @@
     "clean": "rm -rf ./dist",
     "lint": "run-p -l --aggregate-output lint-ts lint-js check-ts",
     "lint-js": "eslint '**/*.js{,x}'",
-    "lint-ts": "tslint './*.ts' 'src/**/*.ts{,x}' --project .",
-    "validate-filenames": "validate-filenames --config validateFilenames.js",
+    "lint-ts": "tslint 'src/**/*.ts' --project .",
+    "validate-filenames": "validate-filenames",
     "deploy": "babel-node deploy.js",
     "lint-staged": "lint-staged",
     "clown": "clown",
     "pre-push": "yarn test",
     "pre-commit": "yarn pretest",
-    "tslint": "yarn lint-ts",
-    "common-check": "run-p -l -c --aggregate-output validate-filenames lint-staged 'clown check'"
+    "common-check": "run-p -l -c --aggregate-output validate-filenames 'clown check' check-integrity",
+    "check-integrity": "yarn check --integrity"
   },
   "resolutions": {
     "babel-core": "^7.0.0-bridge.0"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.0.0-beta.44",
     "@babel/runtime": "^7.0.0-beta.44",
     "@hollowverse/utils": "^5.0.2",
     "@octokit/rest": "^14.0.9",
@@ -54,9 +55,9 @@
     "@babel/node": "^7.0.0-beta.44",
     "@babel/polyfill": "^7.0.0-beta.44",
     "@babel/preset-env": "^7.0.0-beta.44",
-    "@hollowverse/clown": "^0.0.4",
-    "@hollowverse/config": "^7.1.0",
-    "@hollowverse/validate-filenames": "^1.4.0",
+    "@hollowverse/clown": "^3.0.0",
+    "@hollowverse/config": "^16.0.0",
+    "@hollowverse/validate-filenames": "latest",
     "@types/bluebird": "^3.5.20",
     "@types/common-tags": "^1.4.0",
     "@types/got": "^7.1.7",
@@ -69,11 +70,10 @@
     "@types/webpack": "^3.8.8",
     "babel-loader": "^8.0.0-beta.2",
     "copy-webpack-plugin": "^4.5.1",
-    "eslint": "^4.18.2",
-    "husky": "^0.15.0-rc.8",
-    "lint-staged": "^7.0.0",
-    "npm-run-all": "^4.0.2",
-    "prettier": "^1.10.2",
+    "eslint": "latest",
+    "husky": "next",
+    "lint-staged": "latest",
+    "npm-run-all": "latest",
     "serverless": "^1.26.1",
     "serverless-offline": "^3.18.0",
     "serverless-webpack": "^5.1.0",
@@ -83,7 +83,7 @@
     "webpack": "^4.5.0",
     "webpack-cli": "^2.0.13",
     "webpack-node-externals": "^1.6.0",
-    "yarnhook": "^0.1.1"
+    "yarnhook": "latest"
   },
   "lint-staged": {
     "**/*.md": [
@@ -104,7 +104,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn pre-commit",
+      "pre-commit": "run-p -l -c --aggregate-output lint-staged pre-commit",
       "pre-push": "yarn pre-push",
       "post-merge": "yarnhook",
       "post-checkout": "yarnhook",
@@ -114,5 +114,11 @@
   "engines": {
     "node": ">= 6.10"
   },
-  "jest": null
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "useBabelrc": true
+      }
+    }
+  }
 }

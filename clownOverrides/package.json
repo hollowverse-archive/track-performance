@@ -2,8 +2,6 @@
   "scripts": {
     "check-ts": "run-p 'check-ts/*'",
     "pre-push": "yarn test",
-    "pre-commit": "yarn pretest",
-    "tslint": "yarn lint-ts"
-  },
-  "jest": null
+    "pre-commit": "yarn pretest"
+  }
 }

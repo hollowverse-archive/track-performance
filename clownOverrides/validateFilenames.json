@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "validation": "PascalCase",
+      "patterns": ["src/reporters/*.ts"]
+    }
+  ]
+}
