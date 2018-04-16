@@ -16,7 +16,7 @@ export const collectReports = async ({
       reporters,
       async ({ name, instance }): Promise<Report[]> => {
         try {
-          return instance.getReports();
+          return await instance.getReports();
         } catch (error) {
           return [
             {

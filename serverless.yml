@@ -12,11 +12,11 @@ custom:
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: ${opt:stage, 'development'}
+  stage: ${opt:stage}
   memorySize: 128
   timeout: 300
   environment:
-    NODE_ENV: ${opt:stage, self:provider.stage, 'local'}
+    NODE_ENV: ${self:provider.stage, 'local'}
     GITHUB_TOKEN: ${file(./secrets/github.json):token}
     WPT_API_KEY: ${file(./secrets/webpagetest.json):apiKey}
     GOOGLE_API_KEY: ${file(./secrets/google.json):apiKey}
