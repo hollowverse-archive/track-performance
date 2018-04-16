@@ -659,9 +659,9 @@
     lodash "^4.17.4"
     sort-keys "^2.0.0"
 
-"@hollowverse/config@^15.0.0":
-  version "15.0.0"
-  resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-15.0.0.tgz#7becd743e40d5473aa0c657d6dc3b9df3d286988"
+"@hollowverse/config@^16.0.0":
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-16.0.0.tgz#f5c132a97e7da8acdf08369df338ab2d052b18bd"
   dependencies:
     "@babel/core" "7.0.0-beta.44"
     "@babel/plugin-proposal-object-rest-spread" "^7.0.0-beta.44"
