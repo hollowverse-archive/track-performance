@@ -112,13 +112,6 @@
     }
   },
   "engines": {
-    "node": ">= 6.10"
-  },
-  "jest": {
-    "globals": {
-      "ts-jest": {
-        "useBabelrc": true
-      }
-    }
+    "node": ">= 8.10"
   }
 }
