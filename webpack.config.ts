@@ -5,6 +5,7 @@ import path from 'path';
 import nodeExternals from 'webpack-node-externals';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { isProd } from '@hollowverse/utils/helpers/env';
+import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 
 module.exports = {
   mode: isProd ? 'production' : 'development',
@@ -30,6 +31,15 @@ module.exports = {
           },
         ],
       },
+    ],
+  },
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          keep_classnames: true,
+        },
+      }),
     ],
   },
   resolve: {
