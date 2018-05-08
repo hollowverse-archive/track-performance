@@ -1,5 +1,5 @@
 import { GenericReporter, Report } from '../typings/reporter';
-import awsSdk from 'aws-sdk';
+import { ElasticBeanstalk } from 'aws-sdk';
 
 const awsColorsToFormattedColors: Record<string, string> = {
   Green: ':heavy_check_mark: Green',
@@ -13,10 +13,10 @@ const formatAwsHealth = (color: string) => {
 };
 
 export class AwsElasticBeanstalkHealthReporter implements GenericReporter {
-  private eb: AWS.ElasticBeanstalk;
+  private eb: ElasticBeanstalk;
 
   constructor() {
-    this.eb = new awsSdk.ElasticBeanstalk({
+    this.eb = new ElasticBeanstalk({
       apiVersion: '2010-12-01',
     });
   }

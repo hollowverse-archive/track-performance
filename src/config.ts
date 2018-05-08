@@ -1,20 +1,30 @@
-import { join } from 'path';
+import bluebird from 'bluebird';
+import { readAwsSecretsForStage } from '@hollowverse/utils/helpers/readAwsSecretsForStage';
 
-const sshPrivateKeyPath = join(process.cwd(), 'secrets/sshPrivateKey');
+export const getConfig = async () => {
+  const secrets = await readAwsSecretsForStage([
+    'wpt/apiKey',
+    'github/hollowbot/accessToken',
+    'google/searchConsoleApis/apiKey',
+    'hollowbot/sshPrivateKey',
+  ]);
 
-export const config = {
-  sshPrivateKeyPath,
-  shouldPush: process.env.NODE_ENV === 'production',
-  shouldInstallGit: process.env.NODE_ENV !== 'local',
-  webpagetest: {
-    apiKey: process.env.WPT_API_KEY,
-  },
-  github: {
-    token: process.env.GITHUB_TOKEN,
-  },
-  google: {
-    apiKey: process.env.GOOGLE_API_KEY,
-  },
+  return {
+    sshPrivateKey: secrets['hollowbot/sshPrivateKey'],
+    shouldPush: process.env.NODE_ENV === 'production',
+    shouldInstallGit: process.env.NODE_ENV !== 'local',
+    webpagetest: {
+      apiKey: secrets['wpt/apiKey'],
+    },
+    github: {
+      token: secrets['github/hollowbot/accessToken'],
+    },
+    google: {
+      apiKey: secrets['google/searchConsoleApis/apiKey'],
+    },
+  };
 };
 
-export type GlobalConfig = typeof config;
+type UnboxPromise<T> = T extends Promise<infer R> ? R : T;
+
+export type GlobalConfig = UnboxPromise<ReturnType<typeof getConfig>>;

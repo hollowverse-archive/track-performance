@@ -5,7 +5,7 @@ import prettier from 'prettier';
 import shelljs from 'shelljs';
 import tmp from 'tmp';
 import { collectReports } from './helpers/collectReports';
-import { config } from './config';
+import { getConfig } from './config';
 import { format as formatDate } from 'date-fns';
 import { join } from 'path';
 import { renderReport } from './helpers/renderReport';
@@ -23,6 +23,8 @@ import { GenericReporterClass, PageReporterClass } from './typings/reporter';
 
 // tslint:disable no-console max-func-body-length
 export const reportPerformance = async () => {
+  const config = await getConfig();
+
   const urls = [
     'https://hollowverse.com',
     'https://hollowverse.com/Tom_Hanks',
@@ -85,7 +87,7 @@ export const reportPerformance = async () => {
 
   markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
 
-  if (process.env.NODE_ENV === 'local') {
+  if (process.env.STAGE === 'local') {
     console.info(markdownReport);
 
     return;
@@ -105,8 +107,13 @@ export const reportPerformance = async () => {
           shelljs.env.LD_LIBRARY_PATH += ':/tmp/git/usr/lib64';
         }
       },
-      () => {
-        shelljs.cp(config.sshPrivateKeyPath, '/tmp/privateKey');
+      async () => {
+        if (!config.sshPrivateKey) {
+          throw new TypeError(
+            'Expected SSH private key to be provided in configuration',
+          );
+        }
+        await writeFile('/tmp/privateKey', config.sshPrivateKey);
         shelljs.env.GIT_SSH_COMMAND =
           'ssh -o StrictHostKeyChecking=no -i /tmp/privateKey';
       },
@@ -130,6 +137,12 @@ export const reportPerformance = async () => {
       `git commit -m 'Update report file with results from ${dateStr}'`,
       `git push origin -u ${branchName} --force`,
     ]);
+
+    if (config.github.token === undefined) {
+      throw new TypeError(
+        'GitHub access token is required but was not provided',
+      );
+    }
 
     const octokit = new Octokit();
 
