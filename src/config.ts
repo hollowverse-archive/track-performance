@@ -1,4 +1,3 @@
-import bluebird from 'bluebird';
 import { readAwsSecretsForStage } from '@hollowverse/utils/helpers/readAwsSecretsForStage';
 
 export const getConfig = async () => {
