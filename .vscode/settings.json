@@ -3,12 +3,13 @@
   "workbench.colorTheme": "Default Light+",
   "cSpell.words": [
     "Datapoints",
-    "nodegit",
-    "workdir",
+    "hollowbot",
     "hollowverse",
     "loglevel",
+    "nodegit",
     "promisify",
-    "webpagetest"
+    "webpagetest",
+    "workdir"
   ],
   "editor.tabSize": 2,
   "editor.formatOnSave": true,

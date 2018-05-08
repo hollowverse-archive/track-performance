@@ -1,20 +1,20 @@
 import { GenericReporter, Report, TestRecord } from '../typings/reporter';
-import awsSdk from 'aws-sdk';
+import { CloudWatch, Lambda } from 'aws-sdk';
 import moment from 'moment';
 import bluebird from 'bluebird';
 import { defaultFormat } from '../helpers/format';
 import { sum } from 'lodash';
 
 export class AwsLambdaHealthReporter implements GenericReporter {
-  private cloudWatch: AWS.CloudWatch;
-  private lambda: AWS.Lambda;
+  private cloudWatch: CloudWatch;
+  private lambda: Lambda;
 
   constructor() {
-    this.lambda = new awsSdk.Lambda({
+    this.lambda = new Lambda({
       apiVersion: '2015-03-31',
     });
 
-    this.cloudWatch = new awsSdk.CloudWatch({
+    this.cloudWatch = new CloudWatch({
       apiVersion: '2010-08-01',
     });
   }
