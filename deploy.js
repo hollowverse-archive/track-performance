@@ -3,7 +3,6 @@
 /* eslint-disable no-console */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 const shelljs = require('shelljs');
-const { decryptSecrets } = require('@hollowverse/utils/helpers/decryptSecrets');
 const {
   executeCommands,
 } = require('@hollowverse/utils/helpers/executeCommands');
@@ -40,7 +39,6 @@ const secrets = [
 async function main() {
   const buildCommands = ['yarn test'];
   const deploymentCommands = [
-    () => decryptSecrets(secrets, './secrets'),
     'NODE_ENV=production yarn serverless deploy --stage production --force',
   ];
 
