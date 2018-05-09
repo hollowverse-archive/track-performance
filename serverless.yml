@@ -21,6 +21,14 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
+        - secretsmanager:GetSecretValue
+      Resource:
+        - "${self:provider.stage}/wpt/apiKey"
+        - "${self:provider.stage}/github/hollowbot/accessToken"
+        - "${self:provider.stage}/google/searchConsoleApis/apiKey"
+        - "${self:provider.stage}/hollowbot/sshPrivateKey"
+    - Effect: Allow
+      Action:
         - elasticbeanstalk:DescribeEnvironments
         - elasticbeanstalk:DescribeEvents
         - elasticbeanstalk:DescribeApplicationVersions
