@@ -4,6 +4,8 @@ plugins:
   - serverless-webpack
 
 custom:
+  regionAndAccount: us-east-1:251013100663
+  secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
   webpack:
     webpackConfig: webpack.config.ts
     packager: yarn
@@ -23,10 +25,10 @@ provider:
       Action:
         - secretsmanager:GetSecretValue
       Resource:
-        - "${self:provider.stage}/wpt/apiKey"
-        - "${self:provider.stage}/github/hollowbot/accessToken"
-        - "${self:provider.stage}/google/searchConsoleApis/apiKey"
-        - "${self:provider.stage}/hollowbot/sshPrivateKey"
+        - "${secretsArnPrefix}/wpt/apiKey"
+        - "${secretsArnPrefix}/github/hollowbot/accessToken"
+        - "${secretsArnPrefix}/google/searchConsoleApis/apiKey"
+        - "${secretsArnPrefix}/hollowbot/sshPrivateKey"
     - Effect: Allow
       Action:
         - elasticbeanstalk:DescribeEnvironments
