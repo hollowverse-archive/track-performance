@@ -8,7 +8,6 @@ export const getConfig = async () => {
   ]);
 
   return {
-    shouldPush: process.env.NODE_ENV === 'production',
     webpagetest: {
       apiKey: secrets['wpt/apiKey'],
     },

@@ -66,23 +66,21 @@ export const reportPerformance = async () => {
     return;
   }
 
-  if (config.shouldPush) {
-    const { token } = config.splunk;
-    if (!token) {
-      throw new TypeError('No token was provided for Splunk logger');
-    }
-
-    const logger = new SplunkLogger<PerfEvent>({
-      host: 'PerfReports',
-      token,
-      endpoint:
-        'https://input-prd-p-kwnk36xd58jf.cloud.splunk.com:8088/services/collector/event',
-    });
-
-    events.forEach(event => {
-      logger.addEventToQueue(event);
-    });
-
-    await logger.flushEvents();
+  const { token } = config.splunk;
+  if (!token) {
+    throw new TypeError('No token was provided for Splunk logger');
   }
+
+  const logger = new SplunkLogger<PerfEvent>({
+    host: 'PerfReports',
+    token,
+    endpoint:
+      'https://input-prd-p-kwnk36xd58jf.cloud.splunk.com:8088/services/collector/event',
+  });
+
+  events.forEach(event => {
+    logger.addEventToQueue(event);
+  });
+
+  await logger.flushEvents();
 };
