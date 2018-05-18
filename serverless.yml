@@ -26,9 +26,7 @@ provider:
         - secretsmanager:GetSecretValue
       Resource:
         - "${self:custom.secretsArnPrefix}/wpt/apiKey-*"
-        - "${self:custom.secretsArnPrefix}/github/hollowbot/accessToken-*"
         - "${self:custom.secretsArnPrefix}/google/searchConsoleApis/apiKey-*"
-        - "${self:custom.secretsArnPrefix}/hollowbot/sshPrivateKey-*"
     - Effect: Allow
       Action:
         - elasticbeanstalk:DescribeEnvironments
