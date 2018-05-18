@@ -9,7 +9,8 @@
     "promisify",
     "serverless",
     "webpagetest",
-    "workdir"
+    "workdir",
+    "unhandledrejection"
   ],
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
@@ -20,9 +21,19 @@
   "typescript.referencesCodeLens.enabled": true,
   "files.associations": {
     ".gqlconfig": "javascript",
-    ".stylelintrc": "json"
+    ".stylelintrc": "json",
+    "**/.babelrc": "jsonc",
+    "**/.babelrc.json": "jsonc",
+    "**/tsconfig.json": "jsonc"
   },
   "files.exclude": {
     "**/node_modules/**": true
-  }
+  },
+  "eslint.options": {
+    "reportUnusedDisableDirectives": true
+  },
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact"
+  ]
 }
