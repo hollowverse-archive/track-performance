@@ -27,15 +27,7 @@ provider:
       Resource:
         - "${self:custom.secretsArnPrefix}/wpt/apiKey-*"
         - "${self:custom.secretsArnPrefix}/google/searchConsoleApis/apiKey-*"
-    - Effect: Allow
-      Action:
-        - elasticbeanstalk:DescribeEnvironments
-        - elasticbeanstalk:DescribeEvents
-        - elasticbeanstalk:DescribeApplicationVersions
-        - elasticbeanstalk:DescribeInstancesHealth
-        - elasticbeanstalk:DescribeEnvironmentHealth
-        - elasticbeanstalk:DescribeApplications
-      Resource: "*"
+        - "${self:custom.secretsArnPrefix}/splunk/httpCollector/perfReports/token-*"
     - Effect: Allow
       Action:
         - lambda:ListFunctions

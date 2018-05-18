@@ -4,6 +4,7 @@ export const getConfig = async () => {
   const secrets = await readAwsSecretsForStage([
     'wpt/apiKey',
     'google/searchConsoleApis/apiKey',
+    'splunk/httpCollector/perfReports/token',
   ]);
 
   return {
@@ -13,6 +14,9 @@ export const getConfig = async () => {
     },
     google: {
       apiKey: secrets['google/searchConsoleApis/apiKey'],
+    },
+    splunk: {
+      token: secrets['splunk/httpCollector/perfReports/token'],
     },
   };
 };

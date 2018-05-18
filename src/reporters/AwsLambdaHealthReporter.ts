@@ -63,7 +63,7 @@ export class AwsLambdaHealthReporter implements GenericReporter {
         }
 
         return {
-          name: FunctionName,
+          id: FunctionName,
           scores: [sum(Datapoints.map(({ Sum }) => Sum))],
           formatScore: defaultFormat,
         };

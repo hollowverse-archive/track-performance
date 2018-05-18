@@ -46,13 +46,11 @@ export class SecurityHeadersReporter implements PageReporter {
 
     return [
       {
-        name: 'Security Headers',
-        testName: 'URL',
-        scoreNames: ['Grade'],
+        testName: 'Security Headers',
         records: [
           {
-            name: this.url,
-            scores: [score],
+            id: 'grade',
+            value: score,
             formatScore: defaultFormat,
           },
         ],

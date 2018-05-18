@@ -2,16 +2,19 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
     "Datapoints",
+    "Kibibytes",
+    "Splunk",
+    "TTFB",
     "hollowbot",
     "hollowverse",
     "loglevel",
     "nodegit",
     "promisify",
+    "securityheaders",
     "serverless",
-    "webpagetest",
-    "workdir",
     "unhandledrejection",
-    "Splunk"
+    "webpagetest",
+    "workdir"
   ],
   "editor.tabSize": 2,
   "editor.formatOnSave": true,

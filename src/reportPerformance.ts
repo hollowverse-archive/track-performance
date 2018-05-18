@@ -1,15 +1,13 @@
 import bluebird from 'bluebird';
-import prettier from 'prettier';
 import { collectReports } from './helpers/collectReports';
 import { getConfig } from './config';
 import { format as formatDate } from 'date-fns';
-import { renderReport } from './helpers/renderReport';
-import { stripIndents } from 'common-tags';
 import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { AwsLambdaHealthReporter } from './reporters/AwsLambdaHealthReporter';
 import { GenericReporterClass, PageReporterClass } from './typings/reporter';
+import { SplunkLogger } from './helpers/SplunkLogger';
 
 // tslint:disable no-console max-func-body-length
 export const reportPerformance = async () => {
@@ -44,36 +42,59 @@ export const reportPerformance = async () => {
 
   const genericReports = await genericReportersPromise;
   const pageReports = await pageReportsPromise;
+  const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
+  type PerfEvent = {
+    testName: string;
+    scoreName: string;
+    scoreValue: any;
+    date: string;
+    pageUrl: string;
+    reportUrl?: string;
+  };
+
+  const events: PerfEvent[] = [];
+
+  pageReports.forEach(({ url: pageUrl, reports }) => {
+    reports.forEach(report => {
+      if (!('error' in report)) {
+        report.records.forEach(record => {
+          events.push({
+            testName: report.testName,
+            pageUrl,
+            reportUrl: report.url,
+            scoreName: record.id,
+            scoreValue: record.value,
+            date: dateStr,
+          });
+        });
+      }
+    });
+  });
+
+  // @TODO: generic reports?
 
   if (process.env.STAGE === 'local') {
-    const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
-    let markdownReport = stripIndents`
-      Report for tests performed on ${dateStr}
-      ========================================
-
-      ${pageReports
-        .map(
-          ({ url, reports }) => `
-        ## ${url}
-
-        ${reports
-          .map(report => renderReport(report, { headingLevel: 3 }))
-          .join('\n'.repeat(2))}
-      `,
-        )
-        .join('\n'.repeat(2))}
-
-      ${genericReports
-        .map(report => renderReport(report, { headingLevel: 2 }))
-        .join('\n'.repeat(2))}
-    `;
-
-    markdownReport = prettier.format(markdownReport, { parser: 'markdown' });
-    console.info(markdownReport);
+    console.info(events);
 
     return;
   }
 
   if (config.shouldPush) {
+    const { token } = config.splunk;
+    if (!token) {
+      throw new TypeError('No token was provided for Splunk logger');
+    }
+
+    const logger = new SplunkLogger<PerfEvent>({
+      token,
+      endpoint:
+        'https://input-prd-p-kwnk36xd58jf.cloud.splunk.com:8088/services/collector/event',
+    });
+
+    events.forEach(event => {
+      logger.addEventToQueue(event);
+    });
+
+    await logger.flushEvents();
   }
 };

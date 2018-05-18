@@ -1,4 +1,5 @@
 // tslint:disable:no-implicit-dependencies
+/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import webpack from 'webpack';
 import slsw from 'serverless-webpack';
 import path from 'path';

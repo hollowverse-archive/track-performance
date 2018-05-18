@@ -2,14 +2,14 @@ import { post } from 'got';
 import { globalAgent as globalHttpAgent } from 'http';
 import { Agent as HttpsAgent } from 'https';
 
-type SplunkReporterConfig = {
+type SplunkLoggerConfig = {
   token: string;
   endpoint: string;
   source?: string;
   host?: string;
 };
 
-export class SplunkReporter<T extends object> {
+export class SplunkLogger<T extends object> {
   private endpoint: string;
   private source?: string;
   private host?: string;
@@ -19,7 +19,7 @@ export class SplunkReporter<T extends object> {
   public token: string;
   public maxQueueLength = 20;
 
-  constructor({ token, endpoint, source, host }: SplunkReporterConfig) {
+  constructor({ token, endpoint, source, host }: SplunkLoggerConfig) {
     this.token = token;
     this.endpoint = endpoint;
     this.source = source;

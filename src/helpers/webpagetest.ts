@@ -5,9 +5,6 @@ import {
   SuccessResponse,
 } from 'webpagetest';
 
-export const getNumberOfRequests = (view: TestResults.View) =>
-  view.requests.length;
-
 export const isSuccessfulResponse = <D = any>(
   response: Response<D>,
 ): response is SuccessResponse<D> => {
@@ -31,7 +28,7 @@ export const isWaitUntilTestCompleteResponse = <T = any>(
   );
 };
 
-export const lighthouseKeyToName: Record<
+export const lighthouseKeyToNameAndUnit: Record<
   keyof TestResults.LighthouseResults,
   { name: string; unit: 'percent' | 'ms' | 'none' }
 > = {
@@ -62,6 +59,6 @@ export const lighthouseKeyToName: Record<
   'lighthouse.SEO': { name: 'SEO', unit: 'percent' },
 };
 
-export const lighthouseKeys = Object.keys(lighthouseKeyToName) as [
-  keyof typeof lighthouseKeyToName
+export const lighthouseKeys = Object.keys(lighthouseKeyToNameAndUnit) as [
+  keyof typeof lighthouseKeyToNameAndUnit
 ];
