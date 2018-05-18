@@ -73,6 +73,7 @@ export const reportPerformance = async () => {
     }
 
     const logger = new SplunkLogger<PerfEvent>({
+      host: 'PerfReports',
       token,
       endpoint:
         'https://input-prd-p-kwnk36xd58jf.cloud.splunk.com:8088/services/collector/event',
