@@ -10,7 +10,8 @@
     "serverless",
     "webpagetest",
     "workdir",
-    "unhandledrejection"
+    "unhandledrejection",
+    "Splunk"
   ],
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
@@ -32,8 +33,5 @@
   "eslint.options": {
     "reportUnusedDisableDirectives": true
   },
-  "eslint.validate": [
-    "typescript",
-    "typescriptreact"
-  ]
+  "eslint.validate": ["typescript", "typescriptreact"]
 }
