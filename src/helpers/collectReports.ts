@@ -19,6 +19,7 @@ export const collectReports = async ({
           return await instance.getReports();
         } catch (error) {
           console.error(`Failed to run this reporter: ${name}`);
+
           return [];
         }
       },

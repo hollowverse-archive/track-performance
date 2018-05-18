@@ -10,14 +10,13 @@ type SplunkLoggerConfig = {
 };
 
 export class SplunkLogger<T extends object> {
+  public token: string;
+  public maxQueueLength = 20;
   private endpoint: string;
   private source?: string;
   private host?: string;
 
-  private queue: (T & { host?: string; source?: string })[] = [];
-
-  public token: string;
-  public maxQueueLength = 20;
+  private queue: Array<T & { host?: string; source?: string }> = [];
 
   constructor({ token, endpoint, source, host }: SplunkLoggerConfig) {
     this.token = token;
@@ -26,9 +25,14 @@ export class SplunkLogger<T extends object> {
     this.host = host;
   }
 
-  async addEventToQueue(event: T) {
-    const { source, host } = this;
-    this.queue.push(Object.assign({ source, host }, event));
+  async addEventsToQueue(events: T[]) {
+    this.queue.push(
+      ...events.map(event => ({
+        source: this.source,
+        host: this.host,
+        ...(event as any),
+      })),
+    );
 
     if (this.queue.length >= this.maxQueueLength) {
       await this.flushEvents();
@@ -36,6 +40,10 @@ export class SplunkLogger<T extends object> {
   }
 
   async flushEvents() {
+    if (this.queue.length === 0) {
+      return;
+    }
+
     await post(this.endpoint, {
       body: this.queue.map(event => JSON.stringify(event)).join(''),
       agent: {

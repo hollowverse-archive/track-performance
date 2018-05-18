@@ -6,7 +6,7 @@ import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { ReporterClass } from './typings/reporter';
-import { SplunkLogger } from './helpers/SplunkLogger';
+import { SplunkLogger } from './helpers/splunkLogger';
 
 // tslint:disable no-console max-func-body-length
 export const reportPerformance = async () => {
@@ -20,7 +20,7 @@ export const reportPerformance = async () => {
     WebPageTestReporter,
   ];
 
-  const reportsPromise = bluebird.map(urls, async url => ({
+  const pageReports = await bluebird.map(urls, async url => ({
     url,
     reports: await collectReports({
       reporters: pageReporters.map(Class => ({
@@ -30,8 +30,7 @@ export const reportPerformance = async () => {
     }),
   }));
 
-  const pageReports = await reportsPromise;
-  const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
+  const date = formatDate(new Date(), 'YYYY-MM-DD');
   type PerfEvent = {
     testName: string;
     scoreName: string;
@@ -53,7 +52,7 @@ export const reportPerformance = async () => {
             reportUrl: report.url,
             scoreName: record.id,
             scoreValue: record.value,
-            date: dateStr,
+            date,
           });
         });
       }
@@ -78,9 +77,7 @@ export const reportPerformance = async () => {
       'https://input-prd-p-kwnk36xd58jf.cloud.splunk.com:8088/services/collector/event',
   });
 
-  events.forEach(event => {
-    logger.addEventToQueue(event);
-  });
+  await logger.addEventsToQueue(events);
 
   await logger.flushEvents();
 };

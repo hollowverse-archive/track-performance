@@ -62,7 +62,6 @@
     "@types/node": "8",
     "@types/p-debounce": "^1.0.0",
     "@types/prettier": "^1.10.0",
-    "@types/shelljs": "^0.7.9",
     "@types/tmp": "^0.0.33",
     "@types/webpack": "^3.8.8",
     "babel-eslint": "^8.2.2",
