@@ -1,5 +1,5 @@
 import got from 'got';
-import { PageReporter, Report } from '../typings/reporter';
+import { Reporter, Report } from '../typings/reporter';
 import { formatHasPassed, formatYesOrNo } from '../helpers/format';
 import { find } from 'lodash';
 import { GlobalConfig } from '../config';
@@ -57,7 +57,7 @@ type GoogleMobileFriendlinessTestResponse = {
   };
 };
 
-export class MobileFriendlinessReporter implements PageReporter {
+export class MobileFriendlinessReporter implements Reporter {
   private static API_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
 
   private static getApiResponse = debouncePromise(

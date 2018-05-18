@@ -5,8 +5,7 @@ import { format as formatDate } from 'date-fns';
 import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
-import { AwsLambdaHealthReporter } from './reporters/AwsLambdaHealthReporter';
-import { GenericReporterClass, PageReporterClass } from './typings/reporter';
+import { ReporterClass } from './typings/reporter';
 import { SplunkLogger } from './helpers/SplunkLogger';
 
 // tslint:disable no-console max-func-body-length
@@ -15,33 +14,23 @@ export const reportPerformance = async () => {
 
   const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
 
-  const pageReporters: PageReporterClass[] = [
+  const pageReporters: ReporterClass[] = [
     SecurityHeadersReporter,
     MobileFriendlinessReporter,
     WebPageTestReporter,
   ];
 
-  const genericReporters: GenericReporterClass[] = [AwsLambdaHealthReporter];
-
-  const pageReportsPromise = bluebird.map(urls, async url => ({
+  const reportsPromise = bluebird.map(urls, async url => ({
     url,
     reports: await collectReports({
-      reporters: pageReporters.map(ReporterClass => ({
-        name: ReporterClass.name,
-        instance: new ReporterClass(url, config),
+      reporters: pageReporters.map(Class => ({
+        name: Class.name,
+        instance: new Class(url, config),
       })),
     }),
   }));
 
-  const genericReportersPromise = collectReports({
-    reporters: genericReporters.map(ReporterClass => ({
-      name: ReporterClass.name,
-      instance: new ReporterClass(config),
-    })),
-  });
-
-  const genericReports = await genericReportersPromise;
-  const pageReports = await pageReportsPromise;
+  const pageReports = await reportsPromise;
   const dateStr = formatDate(new Date(), 'YYYY-MM-DD');
   type PerfEvent = {
     testName: string;
@@ -70,8 +59,6 @@ export const reportPerformance = async () => {
       }
     });
   });
-
-  // @TODO: generic reports?
 
   if (process.env.STAGE === 'local') {
     console.info(events);

@@ -1,10 +1,10 @@
 import got from 'got';
-import { PageReporter, Report } from '../typings/reporter';
+import { Reporter, Report } from '../typings/reporter';
 import { defaultFormat } from '../helpers/format';
 import debouncePromise from 'p-debounce';
 import { oneLine } from 'common-tags';
 
-export class SecurityHeadersReporter implements PageReporter {
+export class SecurityHeadersReporter implements Reporter {
   private static API_ENDPOINT = 'https://securityheaders.com/';
 
   private static getApiResponse = debouncePromise(
