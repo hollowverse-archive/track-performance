@@ -3,7 +3,6 @@ import webpack from 'webpack';
 import slsw from 'serverless-webpack';
 import path from 'path';
 import nodeExternals from 'webpack-node-externals';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
 import { isProd } from '@hollowverse/utils/helpers/env';
 import UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 
@@ -45,15 +44,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
   },
-  plugins: [
-    // @ts-ignore
-    new CopyWebpackPlugin([
-      {
-        from: 'secrets/**',
-        to: '.',
-      },
-    ]),
-    new webpack.WatchIgnorePlugin([/node_modules/]),
-  ],
+  plugins: [new webpack.WatchIgnorePlugin([/node_modules/])],
   externals: [nodeExternals()],
 };
