@@ -9,6 +9,9 @@
     "eamodio.gitlens",
     "EditorConfig.editorconfig",
     "kisstkondoros.csstriggers",
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "codezombiech.gitignore",
+    "pflannery.vscode-versionlens",
+    "eg2.ts-tslint"
   ]
 }
