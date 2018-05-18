@@ -17,7 +17,6 @@ import { retryCommand } from '@hollowverse/utils/helpers/retryCommand';
 import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
 import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
-import { AwsElasticBeanstalkHealthReporter } from './reporters/AwsElasticBeanstalkHealthReporter';
 import { AwsLambdaHealthReporter } from './reporters/AwsLambdaHealthReporter';
 import { GenericReporterClass, PageReporterClass } from './typings/reporter';
 
@@ -39,10 +38,7 @@ export const reportPerformance = async () => {
     WebPageTestReporter,
   ];
 
-  const genericReporters: GenericReporterClass[] = [
-    AwsElasticBeanstalkHealthReporter,
-    AwsLambdaHealthReporter,
-  ];
+  const genericReporters: GenericReporterClass[] = [AwsLambdaHealthReporter];
 
   const pageReportsPromise = bluebird.map(urls, async url => ({
     url,
