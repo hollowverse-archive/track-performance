@@ -733,9 +733,9 @@
     lodash "^4.17.4"
     sort-keys "^2.0.0"
 
-"@hollowverse/config@^35.0.1":
-  version "35.0.1"
-  resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-35.0.1.tgz#3fe838e6083e3a8a3a103d86983c6222afb0e6b8"
+"@hollowverse/config@^36.0.0":
+  version "36.0.0"
+  resolved "https://registry.yarnpkg.com/@hollowverse/config/-/config-36.0.0.tgz#6adca4cc916732ec0fff108af65e2e1e863f9006"
 
 "@hollowverse/utils@^6.1.0":
   version "6.1.0"
@@ -824,9 +824,9 @@
   version "9.4.7"
   resolved "http://registry.npmjs.org/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
 
-"@types/node@8":
-  version "8.10.16"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.16.tgz#96fadb371748845a0c8ea970a565330efb0a67d5"
+"@types/node@^8.10.17":
+  version "8.10.17"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.17.tgz#d48cf10f0dc6dcf59f827f5a3fc7a4a6004318d3"
 
 "@types/p-debounce@^1.0.0":
   version "1.0.0"

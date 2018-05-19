@@ -28,7 +28,9 @@
     ".stylelintrc": "json",
     "**/.babelrc": "jsonc",
     "**/.babelrc.json": "jsonc",
-    "**/tsconfig.json": "jsonc"
+    "**/tsconfig.json": "jsonc",
+    "**/tslint.json": "jsonc",
+    "**/.eslintrc.json": "jsonc"
   },
   "files.exclude": {
     "**/node_modules/**": true
@@ -36,5 +38,8 @@
   "eslint.options": {
     "reportUnusedDisableDirectives": true
   },
-  "eslint.validate": ["typescript", "typescriptreact"]
+  "eslint.validate": [
+    "typescript",
+    "typescriptreact"
+  ]
 }
