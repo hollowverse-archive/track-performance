@@ -59,7 +59,7 @@ export const reportPerformance = async () => {
     });
   });
 
-  if (process.env.STAGE === 'local') {
+  if (process.env.STAGE !== 'production') {
     console.info(events);
 
     return;
