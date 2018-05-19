@@ -1,10 +1,9 @@
 import got from 'got';
-import { PageReporter, Report } from '../typings/reporter';
-import { defaultFormat } from '../helpers/format';
+import { Reporter, Report } from '../typings/reporter';
 import debouncePromise from 'p-debounce';
 import { oneLine } from 'common-tags';
 
-export class SecurityHeadersReporter implements PageReporter {
+export class SecurityHeadersReporter implements Reporter {
   private static API_ENDPOINT = 'https://securityheaders.com/';
 
   private static getApiResponse = debouncePromise(
@@ -46,14 +45,11 @@ export class SecurityHeadersReporter implements PageReporter {
 
     return [
       {
-        name: 'Security Headers',
-        testName: 'URL',
-        scoreNames: ['Grade'],
+        testName: 'Security Headers',
         records: [
           {
-            name: this.url,
-            scores: [score],
-            formatScore: defaultFormat,
+            id: 'grade',
+            value: score,
           },
         ],
       },

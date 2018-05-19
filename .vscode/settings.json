@@ -2,15 +2,19 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": [
     "Datapoints",
+    "Kibibytes",
+    "Splunk",
+    "TTFB",
     "hollowbot",
     "hollowverse",
     "loglevel",
     "nodegit",
     "promisify",
+    "securityheaders",
     "serverless",
+    "unhandledrejection",
     "webpagetest",
-    "workdir",
-    "unhandledrejection"
+    "workdir"
   ],
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
@@ -24,7 +28,9 @@
     ".stylelintrc": "json",
     "**/.babelrc": "jsonc",
     "**/.babelrc.json": "jsonc",
-    "**/tsconfig.json": "jsonc"
+    "**/tsconfig.json": "jsonc",
+    "**/tslint.json": "jsonc",
+    "**/.eslintrc.json": "jsonc"
   },
   "files.exclude": {
     "**/node_modules/**": true

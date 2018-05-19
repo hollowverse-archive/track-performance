@@ -1,9 +1,8 @@
-import { PageReporter, Report, TestRecord } from '../typings/reporter';
+import { Reporter, Report, TestRecord } from '../typings/reporter';
 
 import WebPageTest, { TestResults, RunTestResponse } from 'webpagetest';
 import bluebird from 'bluebird';
 import {
-  getNumberOfRequests,
   lighthouseKeys,
   lighthouseKeyToName,
   hasLighthouseData,
@@ -13,15 +12,9 @@ import {
 
 import { oneLine } from 'common-tags';
 
-import {
-  formatMillisecondsAsSeconds,
-  formatPercent,
-  defaultFormat,
-  formatBytesAsKibibytes,
-} from '../helpers/format';
 import { GlobalConfig } from '../config';
 
-export class WebPageTestReporter implements PageReporter {
+export class WebPageTestReporter implements Reporter {
   // tslint:disable-next-line:no-multiline-string
   private static CUSTOM_USER_AGENT = oneLine`
     Mozilla/5.0 (Linux;
@@ -50,21 +43,14 @@ export class WebPageTestReporter implements PageReporter {
   }
 
   static getLighthouseRecords(
-    data: TestResults.BaseTestResultsWithLighthouse,
+    view: TestResults.View<TestResults.LighthouseResults>,
   ): TestRecord[] {
-    const { firstView, repeatView } = data.median;
-
     return lighthouseKeys.map((key): TestRecord => {
-      const { unit, name } = lighthouseKeyToName[key];
-      const formatScore =
-        unit === 'percent'
-          ? formatPercent
-          : unit === 'ms' ? formatMillisecondsAsSeconds : defaultFormat;
+      const { name } = lighthouseKeyToName[key];
 
       return {
-        formatScore,
-        name: name,
-        scores: [firstView[key], repeatView[key]],
+        id: name,
+        value: view[key],
       };
     });
   }
@@ -90,62 +76,52 @@ export class WebPageTestReporter implements PageReporter {
       isSuccessfulResponse<any>(runTestResponse) &&
       isWaitUntilTestCompleteResponse(runTestResponse)
     ) {
-      const { data } = runTestResponse;
+      const {
+        data: { summary: url, median: { firstView, repeatView } },
+      } = runTestResponse;
 
-      const reports: Report[] = [
-        {
-          name: 'WebPageTest',
-          url: data.summary,
-          scoreNames: ['First View', 'Repeat View'],
+      let reports: Report[] = [firstView, repeatView].map(
+        (view, i): Report => ({
+          testName: `WebPageTest (${i === 0 ? 'First View' : 'Repeat View'})`,
+          url,
           records: [
             {
-              name: 'Number of requests',
-              scores: [data.median.firstView, data.median.repeatView].map(
-                getNumberOfRequests,
-              ),
-              formatScore: defaultFormat,
+              id: 'Number of requests',
+              value: view.requests.length,
             },
             {
-              name: 'Time to first byte',
-              scores: [data.median.firstView.TTFB, data.median.repeatView.TTFB],
-              formatScore: formatMillisecondsAsSeconds,
+              id: 'Time to first byte',
+              value: view.TTFB,
             },
             {
-              name: 'Fully loaded',
-              scores: [
-                data.median.firstView.fullyLoaded,
-                data.median.repeatView.fullyLoaded,
-              ],
-              formatScore: formatMillisecondsAsSeconds,
+              id: 'Fully loaded',
+              value: view.fullyLoaded,
             },
             {
-              name: 'Response size',
-              scores: [
-                data.median.firstView.bytesIn,
-                data.median.repeatView.bytesIn,
-              ],
-              formatScore: formatBytesAsKibibytes,
+              id: 'Response size',
+              value: view.bytesIn,
             },
             {
-              name: 'Response size (compressed)',
-              scores: [
-                data.median.firstView.gzip_total,
-                data.median.repeatView.gzip_total,
-              ],
-              formatScore: formatBytesAsKibibytes,
+              id: 'Response size (compressed)',
+              value: view.gzip_total,
             },
           ],
-        },
-      ];
+        }),
+      );
 
       if (hasLighthouseData(runTestResponse)) {
-        reports.push({
-          name: 'Lighthouse via WebPageTest',
-          scoreNames: ['First View', 'Repeat View'],
-          records: WebPageTestReporter.getLighthouseRecords(
-            runTestResponse.data,
-          ),
-        });
+        reports = [
+          ...reports,
+          ...[
+            runTestResponse.data.median.firstView,
+            runTestResponse.data.median.repeatView,
+          ].map((view, i) => ({
+            testName: `Lighthouse via WebPageTest (${
+              i === 0 ? 'First View' : 'Repeat View'
+            })`,
+            records: WebPageTestReporter.getLighthouseRecords(view),
+          })),
+        ];
       } else {
         // tslint:disable-next-line:no-multiline-string
         console.warn(oneLine`

@@ -2,12 +2,11 @@
 
 /* eslint-disable no-console */
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
-const shelljs = require('shelljs');
 const {
   executeCommands,
 } = require('@hollowverse/utils/helpers/executeCommands');
 
-const { IS_PULL_REQUEST } = shelljs.env;
+const { IS_PULL_REQUEST } = process.env;
 
 const isPullRequest = IS_PULL_REQUEST !== 'false';
 

@@ -5,9 +5,6 @@ import {
   SuccessResponse,
 } from 'webpagetest';
 
-export const getNumberOfRequests = (view: TestResults.View) =>
-  view.requests.length;
-
 export const isSuccessfulResponse = <D = any>(
   response: Response<D>,
 ): response is SuccessResponse<D> => {
@@ -33,33 +30,28 @@ export const isWaitUntilTestCompleteResponse = <T = any>(
 
 export const lighthouseKeyToName: Record<
   keyof TestResults.LighthouseResults,
-  { name: string; unit: 'percent' | 'ms' | 'none' }
+  { name: string }
 > = {
-  'lighthouse.Performance': { name: 'Performance', unit: 'percent' },
+  'lighthouse.Performance': { name: 'Performance' },
   'lighthouse.Performance.first-meaningful-paint': {
     name: 'First Meaningful Paint',
-    unit: 'ms',
   },
   'lighthouse.Performance.first-interactive': {
     name: 'First Interactive',
-    unit: 'ms',
   },
   'lighthouse.Performance.consistently-interactive': {
     name: 'Consistently Interactive',
-    unit: 'ms',
   },
   'lighthouse.Performance.speed-index-metric': {
     name: 'Speed Index Metric',
-    unit: 'none',
   },
   'lighthouse.Performance.estimated-input-latency': {
     name: 'Estimated Input Latency',
-    unit: 'ms',
   },
-  'lighthouse.ProgressiveWebApp': { name: 'PWA', unit: 'percent' },
-  'lighthouse.Accessibility': { name: 'Accessibility', unit: 'percent' },
-  'lighthouse.BestPractices': { name: 'Best Practices', unit: 'percent' },
-  'lighthouse.SEO': { name: 'SEO', unit: 'percent' },
+  'lighthouse.ProgressiveWebApp': { name: 'PWA' },
+  'lighthouse.Accessibility': { name: 'Accessibility' },
+  'lighthouse.BestPractices': { name: 'Best Practices' },
+  'lighthouse.SEO': { name: 'SEO' },
 };
 
 export const lighthouseKeys = Object.keys(lighthouseKeyToName) as [

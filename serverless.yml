@@ -4,6 +4,10 @@ plugins:
   - serverless-webpack
 
 custom:
+  enabled:
+    production: true
+    development: false
+    local: false
   regionAndAccount: us-east-1:251013100663
   secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
   webpack:
@@ -26,18 +30,8 @@ provider:
         - secretsmanager:GetSecretValue
       Resource:
         - "${self:custom.secretsArnPrefix}/wpt/apiKey-*"
-        - "${self:custom.secretsArnPrefix}/github/hollowbot/accessToken-*"
         - "${self:custom.secretsArnPrefix}/google/searchConsoleApis/apiKey-*"
-        - "${self:custom.secretsArnPrefix}/hollowbot/sshPrivateKey-*"
-    - Effect: Allow
-      Action:
-        - elasticbeanstalk:DescribeEnvironments
-        - elasticbeanstalk:DescribeEvents
-        - elasticbeanstalk:DescribeApplicationVersions
-        - elasticbeanstalk:DescribeInstancesHealth
-        - elasticbeanstalk:DescribeEnvironmentHealth
-        - elasticbeanstalk:DescribeApplications
-      Resource: "*"
+        - "${self:custom.secretsArnPrefix}/splunk/httpCollector/perfReports/token-*"
     - Effect: Allow
       Action:
         - lambda:ListFunctions
@@ -53,7 +47,7 @@ functions:
     events:
       - schedule:
           rate: rate(24 hours)
-          enabled: true
+          enabled: ${self:custom.enabled.${self:provider.stage}}
 
 package:
   include:

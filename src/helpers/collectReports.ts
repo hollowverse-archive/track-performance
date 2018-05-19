@@ -1,9 +1,9 @@
 import { flatten } from 'lodash';
-import { PageReporter, Report, GenericReporter } from '../typings/reporter';
+import { Reporter, Report } from '../typings/reporter';
 import bluebird from 'bluebird';
 
 type CollectReportsOptions = {
-  reporters: Array<{ name: string; instance: PageReporter | GenericReporter }>;
+  reporters: Array<{ name: string; instance: Reporter }>;
   concurrency?: number;
 };
 
@@ -18,12 +18,9 @@ export const collectReports = async ({
         try {
           return await instance.getReports();
         } catch (error) {
-          return [
-            {
-              name,
-              error,
-            },
-          ];
+          console.error(`Failed to run this reporter: ${name}`);
+
+          return [];
         }
       },
       { concurrency },

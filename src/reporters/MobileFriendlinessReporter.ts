@@ -1,6 +1,5 @@
 import got from 'got';
-import { PageReporter, Report } from '../typings/reporter';
-import { formatHasPassed, formatYesOrNo } from '../helpers/format';
+import { Reporter, Report } from '../typings/reporter';
 import { find } from 'lodash';
 import { GlobalConfig } from '../config';
 import debouncePromise from 'p-debounce';
@@ -57,7 +56,7 @@ type GoogleMobileFriendlinessTestResponse = {
   };
 };
 
-export class MobileFriendlinessReporter implements PageReporter {
+export class MobileFriendlinessReporter implements Reporter {
   private static API_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
 
   private static getApiResponse = debouncePromise(
@@ -98,19 +97,12 @@ export class MobileFriendlinessReporter implements PageReporter {
 
     return [
       {
-        name: 'Mobile Friendliness',
-        scoreNames: ['Status'],
+        testName: 'Mobile Friendliness',
         records: [
           {
-            name: 'Is page mobile friendly?',
-            scores: [
-              body.mobileFriendliness === 'MOBILE_FRIENDLY'
-                ? true
-                : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
-                  ? false
-                  : null,
-            ],
-            formatScore: formatYesOrNo,
+            id: 'MOBILE_FRIENDLY',
+            description: 'Is page mobile friendly?',
+            value: body.mobileFriendliness,
           },
           ...Object.keys(ruleKeyToRuleDescription).map(rule => {
             const hasPassed = !find(
@@ -119,9 +111,9 @@ export class MobileFriendlinessReporter implements PageReporter {
             );
 
             return {
-              name: ruleKeyToRuleDescription[rule as Rule],
-              scores: [hasPassed],
-              formatScore: formatHasPassed,
+              id: rule,
+              description: ruleKeyToRuleDescription[rule as Rule],
+              value: hasPassed ? 'passed' : 'failed',
             };
           }),
         ],
