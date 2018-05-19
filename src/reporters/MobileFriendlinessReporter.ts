@@ -102,12 +102,7 @@ export class MobileFriendlinessReporter implements Reporter {
           {
             id: 'MOBILE_FRIENDLY',
             description: 'Is page mobile friendly?',
-            value:
-              body.mobileFriendliness === 'MOBILE_FRIENDLY'
-                ? true
-                : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
-                  ? false
-                  : null,
+            value: body.mobileFriendliness,
           },
           ...Object.keys(ruleKeyToRuleDescription).map(rule => {
             const hasPassed = !find(
@@ -118,7 +113,7 @@ export class MobileFriendlinessReporter implements Reporter {
             return {
               id: rule,
               description: ruleKeyToRuleDescription[rule as Rule],
-              value: hasPassed,
+              value: hasPassed ? 'passed' : 'failed',
             };
           }),
         ],
