@@ -16,7 +16,7 @@ export class SplunkLogger<T extends object> {
   private source?: string;
   private host?: string;
 
-  private queue: Array<T & { host?: string; source?: string }> = [];
+  private queue: Array<{ event: T; host?: string; source?: string }> = [];
 
   constructor({ token, endpoint, source, host }: SplunkLoggerConfig) {
     this.token = token;
@@ -30,7 +30,7 @@ export class SplunkLogger<T extends object> {
       ...events.map(event => ({
         source: this.source,
         host: this.host,
-        ...(event as any),
+        event,
       })),
     );
 
