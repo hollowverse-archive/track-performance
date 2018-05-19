@@ -1,6 +1,5 @@
 import got from 'got';
 import { Reporter, Report } from '../typings/reporter';
-import { defaultFormat } from '../helpers/format';
 import debouncePromise from 'p-debounce';
 import { oneLine } from 'common-tags';
 
@@ -51,7 +50,6 @@ export class SecurityHeadersReporter implements Reporter {
           {
             id: 'grade',
             value: score,
-            formatScore: defaultFormat,
           },
         ],
       },

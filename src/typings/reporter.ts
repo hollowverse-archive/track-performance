@@ -4,7 +4,6 @@ export type TestRecord = {
   id: string;
   description?: string;
   value: number | boolean | string | null;
-  formatScore(score: number | string | boolean | null | undefined): string;
 };
 
 export type Report = {

@@ -4,7 +4,7 @@ import WebPageTest, { TestResults, RunTestResponse } from 'webpagetest';
 import bluebird from 'bluebird';
 import {
   lighthouseKeys,
-  lighthouseKeyToNameAndUnit,
+  lighthouseKeyToName,
   hasLighthouseData,
   isSuccessfulResponse,
   isWaitUntilTestCompleteResponse,
@@ -12,12 +12,6 @@ import {
 
 import { oneLine } from 'common-tags';
 
-import {
-  formatMillisecondsAsSeconds,
-  formatPercent,
-  defaultFormat,
-  formatBytesAsKibibytes,
-} from '../helpers/format';
 import { GlobalConfig } from '../config';
 
 export class WebPageTestReporter implements Reporter {
@@ -52,17 +46,9 @@ export class WebPageTestReporter implements Reporter {
     view: TestResults.View<TestResults.LighthouseResults>,
   ): TestRecord[] {
     return lighthouseKeys.map((key): TestRecord => {
-      const { unit, name } = lighthouseKeyToNameAndUnit[key];
-      let formatScore: TestRecord['formatScore'] = defaultFormat;
-
-      if (unit === 'ms') {
-        formatScore = formatMillisecondsAsSeconds;
-      } else if (unit === 'percent') {
-        formatScore = formatPercent;
-      }
+      const { name } = lighthouseKeyToName[key];
 
       return {
-        formatScore,
         id: name,
         value: view[key],
       };
@@ -102,27 +88,22 @@ export class WebPageTestReporter implements Reporter {
             {
               id: 'Number of requests',
               value: view.requests.length,
-              formatScore: defaultFormat,
             },
             {
               id: 'Time to first byte',
               value: view.TTFB,
-              formatScore: formatMillisecondsAsSeconds,
             },
             {
               id: 'Fully loaded',
               value: view.fullyLoaded,
-              formatScore: formatMillisecondsAsSeconds,
             },
             {
               id: 'Response size',
               value: view.bytesIn,
-              formatScore: formatBytesAsKibibytes,
             },
             {
               id: 'Response size (compressed)',
               value: view.gzip_total,
-              formatScore: formatBytesAsKibibytes,
             },
           ],
         }),

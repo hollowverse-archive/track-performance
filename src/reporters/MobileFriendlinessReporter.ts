@@ -1,6 +1,5 @@
 import got from 'got';
 import { Reporter, Report } from '../typings/reporter';
-import { formatHasPassed, formatYesOrNo } from '../helpers/format';
 import { find } from 'lodash';
 import { GlobalConfig } from '../config';
 import debouncePromise from 'p-debounce';
@@ -109,7 +108,6 @@ export class MobileFriendlinessReporter implements Reporter {
                 : body.mobileFriendliness === 'NOT_MOBILE_FRIENDLY'
                   ? false
                   : null,
-            formatScore: formatYesOrNo,
           },
           ...Object.keys(ruleKeyToRuleDescription).map(rule => {
             const hasPassed = !find(
@@ -121,7 +119,6 @@ export class MobileFriendlinessReporter implements Reporter {
               id: rule,
               description: ruleKeyToRuleDescription[rule as Rule],
               value: hasPassed,
-              formatScore: formatHasPassed,
             };
           }),
         ],
