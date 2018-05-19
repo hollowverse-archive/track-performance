@@ -8,6 +8,15 @@ import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReport
 import { ReporterClass } from './typings/reporter';
 import { SplunkLogger } from './helpers/splunkLogger';
 
+type PerfEvent = {
+  testName: string;
+  scoreName: string;
+  scoreValue: any;
+  date: string;
+  pageUrl: string;
+  reportUrl?: string;
+};
+
 // tslint:disable no-console max-func-body-length
 export const reportPerformance = async () => {
   const config = await getConfig();
@@ -31,14 +40,6 @@ export const reportPerformance = async () => {
   }));
 
   const date = formatDate(new Date(), 'YYYY-MM-DD');
-  type PerfEvent = {
-    testName: string;
-    scoreName: string;
-    scoreValue: any;
-    date: string;
-    pageUrl: string;
-    reportUrl?: string;
-  };
 
   const events: PerfEvent[] = [];
 
