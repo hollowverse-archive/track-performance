@@ -18,7 +18,7 @@ export const collectReports = async ({
         try {
           return await instance.getReports();
         } catch (error) {
-          console.error(`Failed to run this reporter: ${name}`);
+          console.error(`Failed to run this reporter: ${name}:`, error);
 
           return [];
         }
