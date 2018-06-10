@@ -63,16 +63,21 @@ export class ScreenshotDiffReporter implements Reporter {
   private bucketName: string;
   private s3 = new S3();
 
-  constructor(url: string, config: Pick<GlobalConfig, 'screenshotsBucket'>) {
+  constructor(
+    url: string,
+    { screenshotsBucket }: Pick<GlobalConfig, 'screenshotsBucket'> = {
+      screenshotsBucket: undefined,
+    },
+  ) {
     this.url = url;
 
-    if (!config.screenshotsBucket) {
+    if (!screenshotsBucket) {
       throw new TypeError(
         'Expected a bucket name to be provided to ScreenshotDiffReporter constructor',
       );
     }
 
-    this.bucketName = config.screenshotsBucket;
+    this.bucketName = screenshotsBucket;
   }
 
   private static getScreenshotUrl = async ({ jobId }: { jobId: string }) => {
