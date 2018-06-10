@@ -41,6 +41,7 @@
     "lodash": "^4.17.5",
     "moment": "^2.22.0",
     "p-throttle": "^1.1.0",
+    "pixelmatch": "^4.0.2",
     "prettier": "^1.10.2",
     "webpagetest": "^0.3.8"
   },
@@ -60,6 +61,7 @@
     "@types/lodash": "^4.14.104",
     "@types/node": "^8.10.17",
     "@types/p-throttle": "^1.1.0",
+    "@types/pixelmatch": "^4.0.0",
     "@types/prettier": "^1.10.0",
     "@types/tmp": "^0.0.33",
     "@types/webpack": "^3.8.8",
