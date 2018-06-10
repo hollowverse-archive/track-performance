@@ -8,7 +8,7 @@ Every day, the function runs a set of "reporters", each reporter communicates wi
 * [WebPageTest](https://webpagetest.org/)
 * [Google's Mobile Friendly Test](https://search.google.com/test/mobile-friendly)
 
-The function then collects the results and prepares an aggregated report. The report is sent as a pull request to [`hollowverse/perf-reports`](https://github.com/hollowverse/perf-reports) which gets merged automatically. The diff can be previewed on GitHub to detect any potential regressions.
+The function then collects the results and sends them as log events to our [Splunk](https://splunk.com) instance.
 
 ---
 
