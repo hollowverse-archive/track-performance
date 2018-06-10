@@ -117,14 +117,17 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const reportDiff = ScreenshotDiffReporter.waitForScreenshotUrl({
       jobId,
-    }).then(async url => {
+    }).then(async (url): Promise<Report[]> => {
       const newImagePromise = got(url, { encoding: null }).then(
         async res => res.body,
       );
+
+      const s3ImageKey = `screenshots/${url}/referenceScreenshot.png`;
+
       const referenceImagePromise = this.s3
         .getObject({
           Bucket: this.bucketName,
-          Key: 'referenceScreenshot.png',
+          Key: s3ImageKey,
         })
         .promise()
         .then(res => res.Body);
@@ -134,37 +137,37 @@ export class ScreenshotDiffReporter implements Reporter {
         referenceImagePromise,
       ]);
 
-      if (referenceImage && referenceImage instanceof Buffer) {
-        const diff = pixelmatch(
-          referenceImage,
-          newImage,
-          Buffer.alloc(0),
-          1020,
-          691,
-        );
+      await this.s3
+        .putObject({
+          Bucket: this.bucketName,
+          Key: s3ImageKey,
+          Body: newImage,
+        })
+        .promise();
 
-        await this.s3
-          .putObject({
-            Bucket: this.bucketName,
-            Key: 'referenceScreenshot.png',
-            Body: newImagePromise,
-          })
-          .promise();
-
-        return [
-          {
-            testName: 'Screenshot Diff',
-            records: [
-              {
-                id: 'diff',
-                value: diff,
-              },
-            ],
-          },
-        ];
+      if (!referenceImage || !(referenceImage instanceof Buffer)) {
+        throw new TypeError('Could not find reference image');
       }
 
-      throw new TypeError('Could not find reference image');
+      const diff = pixelmatch(
+        referenceImage,
+        newImage,
+        Buffer.alloc(0),
+        1020,
+        691,
+      );
+
+      return [
+        {
+          testName: 'Screenshot Diff',
+          records: [
+            {
+              id: 'diff',
+              value: diff,
+            },
+          ],
+        },
+      ];
     });
 
     return bluebird.race<Report[]>([reportDiff, timeOut]);
