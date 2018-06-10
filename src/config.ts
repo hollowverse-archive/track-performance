@@ -17,6 +17,7 @@ export const getConfig = async () => {
     splunk: {
       token: secrets['splunk/httpCollector/perfReports/token'],
     },
+    screenshotsBucket: process.env.SCREENSHOTS_BUCKET_NAME,
   };
 };
 

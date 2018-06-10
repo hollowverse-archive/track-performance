@@ -3,6 +3,8 @@ import { Reporter, Report } from '../typings/reporter';
 import debouncePromise from 'p-debounce';
 import pixelmatch from 'pixelmatch';
 import bluebird from 'bluebird';
+import { S3 } from 'aws-sdk';
+import { GlobalConfig } from '../config';
 
 /* eslint-disable camelcase */
 type ScreenshotResponseBody = {
@@ -58,9 +60,19 @@ export class ScreenshotDiffReporter implements Reporter {
   );
 
   private url: string;
+  private bucketName: string;
+  private s3 = new S3();
 
-  constructor(url: string) {
+  constructor(url: string, config: Pick<GlobalConfig, 'screenshotsBucket'>) {
     this.url = url;
+
+    if (!config.screenshotsBucket) {
+      throw new TypeError(
+        'Expected a bucket name to be provided to ScreenshotDiffReporter constructor',
+      );
+    }
+
+    this.bucketName = config.screenshotsBucket;
   }
 
   private static getScreenshotUrl = async ({ jobId }: { jobId: string }) => {
@@ -99,17 +111,45 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const jobId = body.id;
 
-    return bluebird.race<Report[]>([
-      ScreenshotDiffReporter.waitForScreenshotUrl({ jobId }).then(async url => {
-        const image = await got(url);
-        const referenceImage = await s3;
+    const timeOut = bluebird.delay(3000).then(() => {
+      throw new TypeError('Screenshot reporter timed out');
+    });
+
+    const reportDiff = ScreenshotDiffReporter.waitForScreenshotUrl({
+      jobId,
+    }).then(async url => {
+      const newImagePromise = got(url, { encoding: null }).then(
+        async res => res.body,
+      );
+      const referenceImagePromise = this.s3
+        .getObject({
+          Bucket: this.bucketName,
+          Key: 'referenceScreenshot.png',
+        })
+        .promise()
+        .then(res => res.Body);
+
+      const [newImage, referenceImage] = await Promise.all([
+        newImagePromise,
+        referenceImagePromise,
+      ]);
+
+      if (referenceImage && referenceImage instanceof Buffer) {
         const diff = pixelmatch(
-          image,
           referenceImage,
+          newImage,
           Buffer.alloc(0),
           1020,
           691,
         );
+
+        await this.s3
+          .putObject({
+            Bucket: this.bucketName,
+            Key: 'referenceScreenshot.png',
+            Body: newImagePromise,
+          })
+          .promise();
 
         return [
           {
@@ -122,10 +162,11 @@ export class ScreenshotDiffReporter implements Reporter {
             ],
           },
         ];
-      }),
-      bluebird.delay(3000).then(() => {
-        throw new TypeError('Screenshot reporter timed out');
-      }),
-    ]);
+      }
+
+      throw new TypeError('Could not find reference image');
+    });
+
+    return bluebird.race<Report[]>([reportDiff, timeOut]);
   }
 }
