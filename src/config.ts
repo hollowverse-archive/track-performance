@@ -5,6 +5,7 @@ export const getConfig = async () => {
     'wpt/apiKey',
     'google/searchConsoleApis/apiKey',
     'splunk/httpCollector/perfReports/token',
+    'browserstack/apiKey',
   ]);
 
   return {
@@ -17,7 +18,11 @@ export const getConfig = async () => {
     splunk: {
       token: secrets['splunk/httpCollector/perfReports/token'],
     },
-    screenshotsBucket: process.env.SCREENSHOTS_BUCKET_NAME,
+    browserstack: {
+      username: 'hollowverse1',
+      apiKey: secrets['browserstack/apiKey'],
+      screenshotsBucket: process.env.SCREENSHOTS_BUCKET_NAME,
+    },
   };
 };
 

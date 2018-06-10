@@ -42,10 +42,15 @@ export class ScreenshotDiffReporter implements Reporter {
   private static startScreenshotJobs = debouncePromise(
     async ({
       url,
+      username,
+      password,
     }: {
       url: string;
+      username: string;
+      password: string;
     }): Promise<GotPromise<ScreenshotResponseBody>> =>
       got.post(ScreenshotDiffReporter.API_ENDPOINT, {
+        auth: `${username}:${password}`,
         body: {
           url,
           browser: 'chrome',
@@ -61,29 +66,42 @@ export class ScreenshotDiffReporter implements Reporter {
 
   private url: string;
   private bucketName: string;
+  private username: string;
+  private apiKey: string;
   private s3 = new S3();
 
-  constructor(
-    url: string,
-    { screenshotsBucket }: Pick<GlobalConfig, 'screenshotsBucket'> = {
-      screenshotsBucket: undefined,
-    },
-  ) {
+  constructor(url: string, config?: Pick<GlobalConfig, 'browserstack'>) {
     this.url = url;
 
-    if (!screenshotsBucket) {
+    if (
+      !config ||
+      !config.browserstack.apiKey ||
+      !config.browserstack.username ||
+      !config.browserstack.screenshotsBucket
+    ) {
       throw new TypeError(
-        'Expected a bucket name to be provided to ScreenshotDiffReporter constructor',
+        'Invalid configuration provided to ScreenshotDiffReporter constructor',
       );
     }
 
-    this.bucketName = screenshotsBucket;
+    this.bucketName = config.browserstack.screenshotsBucket;
+    this.apiKey = config.browserstack.apiKey;
+    this.username = config.browserstack.username;
   }
 
-  private static getScreenshotUrl = async ({ jobId }: { jobId: string }) => {
+  private static getScreenshotUrl = async ({
+    jobId,
+    username,
+    password,
+  }: {
+    username: string;
+    password: string;
+    jobId: string;
+  }) => {
     const { body } = await got(
       `${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`,
       {
+        auth: `${username}:${password}`,
         json: true,
       },
     );
@@ -95,15 +113,15 @@ export class ScreenshotDiffReporter implements Reporter {
     return undefined;
   };
 
-  private static waitForScreenshotUrl = async ({
-    jobId,
-  }: {
+  private static waitForScreenshotUrl = async (options: {
+    username: string;
+    password: string;
     jobId: string;
   }) => {
     let url: string | undefined;
 
     while (url === undefined) {
-      url = await ScreenshotDiffReporter.getScreenshotUrl({ jobId });
+      url = await ScreenshotDiffReporter.getScreenshotUrl(options);
     }
 
     return url;
@@ -112,6 +130,8 @@ export class ScreenshotDiffReporter implements Reporter {
   async getReports(): Promise<Report[]> {
     const { body } = await ScreenshotDiffReporter.startScreenshotJobs({
       url: this.url,
+      password: this.apiKey,
+      username: this.username,
     });
 
     const jobId = body.id;
@@ -122,6 +142,8 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const reportDiff = ScreenshotDiffReporter.waitForScreenshotUrl({
       jobId,
+      password: this.apiKey,
+      username: this.username,
     }).then(async (url): Promise<Report[]> => {
       const newImagePromise = got(url, { encoding: null }).then(
         async res => res.body,

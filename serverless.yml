@@ -8,6 +8,7 @@ custom:
     production: true
     development: false
     local: false
+  bucketName: track-performance-${self:provider.stage}
   regionAndAccount: us-east-1:251013100663
   secretsArnPrefix: arn:aws:secretsmanager:${self:custom.regionAndAccount}:secret:${self:provider.stage}
   webpack:
@@ -24,6 +25,7 @@ provider:
   environment:
     NODE_ENV: ${env:NODE_ENV, 'development'}
     STAGE: ${self:provider.stage}
+    SCREENSHOTS_BUCKET_NAME: ${self:custom.bucketName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -32,6 +34,12 @@ provider:
         - "${self:custom.secretsArnPrefix}/wpt/apiKey-*"
         - "${self:custom.secretsArnPrefix}/google/searchConsoleApis/apiKey-*"
         - "${self:custom.secretsArnPrefix}/splunk/httpCollector/perfReports/token-*"
+        - "${self:custom.secretsArnPrefix}/browserstack/apiKey-*"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource:
+        - "arn:aws:s3:::${self:custom.bucketName}/*"
     - Effect: Allow
       Action:
         - lambda:ListFunctions
@@ -55,4 +63,11 @@ package:
     - secrets/**
   exclude:
     - .webpack
+
+resources:
+  Resources:
+    S3Bucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: ${self:custom.bucketName}
 
