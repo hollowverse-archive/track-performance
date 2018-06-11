@@ -7,6 +7,7 @@ import { WebPageTestReporter } from './reporters/WebPageTestReporter';
 import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { ReporterClass } from './typings/reporter';
 import { SplunkLogger } from './helpers/splunkLogger';
+import { ScreenshotDiffReporter } from './reporters/ScreenshotDiffReporter';
 
 type PerfEvent = {
   testName: string;
@@ -24,6 +25,7 @@ export const reportPerformance = async () => {
   const urls = ['https://hollowverse.com', 'https://hollowverse.com/Tom_Hanks'];
 
   const pageReporters: ReporterClass[] = [
+    ScreenshotDiffReporter,
     SecurityHeadersReporter,
     MobileFriendlinessReporter,
     WebPageTestReporter,
