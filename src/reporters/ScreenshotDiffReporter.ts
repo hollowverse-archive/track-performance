@@ -131,8 +131,8 @@ export class ScreenshotDiffReporter implements Reporter {
   }
 
   private static waitForScreenshots = async ({
-    pollIntervalMilliseconds = 1000,
-    maxNumAttempts = 3,
+    pollIntervalMilliseconds = 3000,
+    maxNumAttempts = 50,
     ...restOptions
   }: {
     pollIntervalMilliseconds?: number;
@@ -187,7 +187,7 @@ export class ScreenshotDiffReporter implements Reporter {
 
     if (screenshots.length === 0) {
       throw new Error(
-        'No screenshots were returned from BrowserStack API call',
+        `No screenshots were returned from BrowserStack API call. Job ID: ${jobId}`,
       );
     }
 
