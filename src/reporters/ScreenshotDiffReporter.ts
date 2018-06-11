@@ -184,78 +184,82 @@ export class ScreenshotDiffReporter implements Reporter {
       username: this.username,
     });
 
-    return bluebird.map(screenshots, async screenshot => {
-      if (screenshot.state !== 'done') {
-        throw new TypeError('Could not get screenshot URL');
-      }
-
-      const newImagePromise = got(screenshot.image_url, {
-        encoding: null,
-      }).then(async res => res.body);
-
-      const {
-        url,
-        browser,
-        os,
-        os_version: osVersion,
-        browser_version: browserVersion,
-      } = screenshot;
-      const normalizedUrl = url.replace(/^https?:\/\//, '');
-
-      const screenshotId = `${browser} ${browserVersion} on ${os} ${osVersion}`;
-
-      const s3ImageKey = `screenshots/${normalizedUrl}/${screenshotId}/referenceScreenshot.png`;
-
-      const referenceImagePromise = this.s3
-        .getObject({
-          Bucket: this.bucketName,
-          Key: s3ImageKey,
-        })
-        .promise()
-        .then(res => res.Body)
-        .catch(() => undefined);
-
-      const [newImage, referenceImage] = await Promise.all([
-        newImagePromise,
-        referenceImagePromise,
-      ]);
-
-      await this.s3
-        .putObject({
-          Bucket: this.bucketName,
-          Key: s3ImageKey,
-          Body: newImage,
-        })
-        .promise();
-
-      if (!referenceImage || !(referenceImage instanceof Buffer)) {
-        throw new TypeError('Could not find reference image in S3 bucket');
-      }
-
-      const [
-        { bitmap: { width: refWidth, height: refHeight } },
-        { bitmap: { width: newWidth, height: newHeight } },
-      ] = await bluebird.map([referenceImage, newImage], async imageBuffer =>
-        jimp.read(imageBuffer),
-      );
-
-      const diff = pixelmatch(
-        referenceImage,
-        newImage,
-        null,
-        Math.min(refWidth, newWidth),
-        Math.min(refHeight, newHeight),
-      );
-
-      return {
-        testName: `Screenshot Diff (${screenshotId})`,
-        records: [
-          {
-            id: 'diff',
-            value: diff,
-          },
-        ],
-      };
-    });
+    return bluebird.map(screenshots, this.screenshotToDiffReport);
   }
+
+  private screenshotToDiffReport = async (
+    screenshot: Screenshot,
+  ): Promise<Report> => {
+    if (screenshot.state !== 'done') {
+      throw new TypeError('Could not get screenshot URL');
+    }
+
+    const newImagePromise = got(screenshot.image_url, {
+      encoding: null,
+    }).then(async res => res.body);
+
+    const {
+      url,
+      browser,
+      os,
+      os_version: osVersion,
+      browser_version: browserVersion,
+    } = screenshot;
+    const normalizedUrl = url.replace(/^https?:\/\//, '');
+
+    const screenshotId = `${browser} ${browserVersion} on ${os} ${osVersion}`;
+
+    const s3ImageKey = `screenshots/${normalizedUrl}/${screenshotId}/referenceScreenshot.png`;
+
+    const referenceImagePromise = this.s3
+      .getObject({
+        Bucket: this.bucketName,
+        Key: s3ImageKey,
+      })
+      .promise()
+      .then(res => res.Body)
+      .catch(() => undefined);
+
+    const [newImage, referenceImage] = await Promise.all([
+      newImagePromise,
+      referenceImagePromise,
+    ]);
+
+    await this.s3
+      .putObject({
+        Bucket: this.bucketName,
+        Key: s3ImageKey,
+        Body: newImage,
+      })
+      .promise();
+
+    if (!referenceImage || !(referenceImage instanceof Buffer)) {
+      throw new TypeError('Could not find reference image in S3 bucket');
+    }
+
+    const [
+      { bitmap: { width: refWidth, height: refHeight } },
+      { bitmap: { width: newWidth, height: newHeight } },
+    ] = await bluebird.map([referenceImage, newImage], async imageBuffer =>
+      jimp.read(imageBuffer),
+    );
+
+    const diff = pixelmatch(
+      referenceImage,
+      newImage,
+      null,
+      Math.min(refWidth, newWidth),
+      Math.min(refHeight, newHeight),
+    );
+
+    return {
+      testName: `Screenshot Diff (${screenshotId})`,
+      records: [
+        {
+          id: 'diff',
+          value: diff,
+        },
+      ],
+    };
+  };
 }
