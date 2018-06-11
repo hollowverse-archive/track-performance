@@ -33,7 +33,7 @@ type PostScreenshotResponse = {
   callback_url: string | null;
   win_res: string;
   mac_res: string;
-  quality: string;
+  quality: 'compressed' | 'original';
   wait_time: number;
   orientation: string;
   screenshots: Screenshot[];
