@@ -1,6 +1,5 @@
 import got, { GotPromise } from 'got';
 import { Reporter, Report } from '../typings/reporter';
-import debouncePromise from 'p-debounce';
 import pixelmatch from 'pixelmatch';
 import bluebird from 'bluebird';
 import { S3 } from 'aws-sdk';
@@ -61,49 +60,6 @@ type Browser = {
 export class ScreenshotDiffReporter implements Reporter {
   private static API_ENDPOINT = 'https://www.browserstack.com/screenshots';
 
-  private static startScreenshotsJob = debouncePromise(
-    async ({
-      url,
-      username,
-      token,
-      browsers,
-    }: {
-      url: string;
-      username: string;
-      token: string;
-      browsers: Browser[];
-    }): Promise<string> => {
-      const { body } = await got.post(ScreenshotDiffReporter.API_ENDPOINT, {
-        auth: `${username}:${token}`,
-        body: {
-          url,
-          browsers,
-        },
-        json: true,
-      });
-
-      return (body as PostScreenshotResponse).job_id;
-    },
-    200,
-  );
-
-  private static getScreenshotsJob = debouncePromise(
-    async ({
-      jobId,
-      username,
-      token,
-    }: {
-      jobId: string;
-      username: string;
-      token: string;
-    }): Promise<GotPromise<GetJobResponse>> =>
-      got(`${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`, {
-        auth: `${username}:${token}`,
-        json: true,
-      }),
-    200,
-  );
-
   private url: string;
   private bucketName: string;
   private username: string;
@@ -128,6 +84,43 @@ export class ScreenshotDiffReporter implements Reporter {
     this.token = config.browserStack.token;
     this.username = config.browserStack.username;
   }
+
+  private static startScreenshotsJob = async ({
+      url,
+      username,
+      token,
+      browsers,
+    }: {
+      url: string;
+      username: string;
+      token: string;
+      browsers: Browser[];
+    }): Promise<string> => {
+      const { body } = await got.post(ScreenshotDiffReporter.API_ENDPOINT, {
+        auth: `${username}:${token}`,
+        body: {
+          url,
+          browsers,
+        },
+        json: true,
+      });
+
+      return (body as PostScreenshotResponse).job_id;
+  };
+
+  private static getScreenshotsJob = async ({
+      jobId,
+      username,
+      token,
+    }: {
+      jobId: string;
+      username: string;
+      token: string;
+    }): Promise<GotPromise<GetJobResponse>> =>
+      got(`${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`, {
+        auth: `${username}:${token}`,
+        json: true,
+    });
 
   private static waitForScreenshots = async ({
     pollIntervalMilliseconds = 3000,
