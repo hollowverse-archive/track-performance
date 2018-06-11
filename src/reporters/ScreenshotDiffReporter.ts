@@ -126,6 +126,9 @@ export class ScreenshotDiffReporter implements Reporter {
 
     while (url === undefined) {
       url = await ScreenshotDiffReporter.getScreenshotUrl(options);
+      if (!url) {
+        await bluebird.delay(500);
+      }
     }
 
     return url;
@@ -140,69 +143,57 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const jobId = body.job_id;
 
-    const timeOut = bluebird.delay(30000).then(() => {
-      throw new TypeError('Screenshot reporter timed out');
-    });
-
-    const reportDiff = ScreenshotDiffReporter.waitForScreenshotUrl({
+    const url = await ScreenshotDiffReporter.waitForScreenshotUrl({
       jobId,
       password: this.apiKey,
       username: this.username,
-    }).then(async (url): Promise<Report[]> => {
-      const newImagePromise = got(url, { encoding: null }).then(
-        async res => res.body,
-      );
-
-      const { pathname, hostname } = new URL(this.url);
-      const s3ImageKey = `screenshots/${hostname}/${pathname}/referenceScreenshot.png`;
-
-      const referenceImagePromise = this.s3
-        .getObject({
-          Bucket: this.bucketName,
-          Key: s3ImageKey,
-        })
-        .promise()
-        .then(res => res.Body)
-        .catch(() => undefined);
-
-      const [newImage, referenceImage] = await Promise.all([
-        newImagePromise,
-        referenceImagePromise,
-      ]);
-
-      await this.s3
-        .putObject({
-          Bucket: this.bucketName,
-          Key: s3ImageKey,
-          Body: newImage,
-        })
-        .promise();
-
-      if (!referenceImage || !(referenceImage instanceof Buffer)) {
-        throw new TypeError('Could not find reference image');
-      }
-
-      const diff = pixelmatch(
-        referenceImage,
-        newImage,
-        Buffer.alloc(0),
-        1024,
-        1644,
-      );
-
-      return [
-        {
-          testName: 'Screenshot Diff',
-          records: [
-            {
-              id: 'diff',
-              value: diff,
-            },
-          ],
-        },
-      ];
     });
 
-    return bluebird.race<Report[]>([reportDiff, timeOut]);
+    const newImagePromise = got(url, { encoding: null }).then(
+      async res => res.body,
+    );
+
+    const { pathname, hostname } = new URL(this.url);
+    const s3ImageKey = `screenshots/${hostname}/${pathname}/referenceScreenshot.png`;
+
+    const referenceImagePromise = this.s3
+      .getObject({
+        Bucket: this.bucketName,
+        Key: s3ImageKey,
+      })
+      .promise()
+      .then(res => res.Body)
+      .catch(() => undefined);
+
+    const [newImage, referenceImage] = await Promise.all([
+      newImagePromise,
+      referenceImagePromise,
+    ]);
+
+    await this.s3
+      .putObject({
+        Bucket: this.bucketName,
+        Key: s3ImageKey,
+        Body: newImage,
+      })
+      .promise();
+
+    if (!referenceImage || !(referenceImage instanceof Buffer)) {
+      throw new TypeError('Could not find reference image');
+    }
+
+    const diff = pixelmatch(referenceImage, newImage, null, 1024, 1644);
+
+    return [
+      {
+        testName: 'Screenshot Diff',
+        records: [
+          {
+            id: 'diff',
+            value: diff,
+          },
+        ],
+      },
+    ];
   }
 }
