@@ -62,7 +62,7 @@ type Browser = {
 export class ScreenshotDiffReporter implements Reporter {
   private static API_ENDPOINT = 'https://www.browserstack.com/screenshots';
 
-  private static startScreenshotJobs = debouncePromise(
+  private static startScreenshotsJob = debouncePromise(
     async ({
       url,
       username,
@@ -131,11 +131,11 @@ export class ScreenshotDiffReporter implements Reporter {
   }
 
   private static waitForScreenshots = async ({
-    pollInterval = 500,
+    pollIntervalMilliseconds = 500,
     maxNumAttempts = 5,
     ...restOptions
   }: {
-    pollInterval?: number;
+    pollIntervalMilliseconds?: number;
     maxNumAttempts?: number;
     username: string;
     apiKey: string;
@@ -156,7 +156,7 @@ export class ScreenshotDiffReporter implements Reporter {
       }
 
       numAttempts += 1;
-      await bluebird.delay(pollInterval);
+      await bluebird.delay(pollIntervalMilliseconds);
     }
     /* eslint-enable no-await-in-loop */
 
@@ -164,7 +164,7 @@ export class ScreenshotDiffReporter implements Reporter {
   };
 
   async getReports(): Promise<Report[]> {
-    const jobId = await ScreenshotDiffReporter.startScreenshotJobs({
+    const jobId = await ScreenshotDiffReporter.startScreenshotsJob({
       url: this.url,
       apiKey: this.apiKey,
       username: this.username,
