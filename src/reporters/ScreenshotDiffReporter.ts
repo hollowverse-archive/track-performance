@@ -5,7 +5,6 @@ import pixelmatch from 'pixelmatch';
 import bluebird from 'bluebird';
 import { S3 } from 'aws-sdk';
 import { GlobalConfig } from '../config';
-import jimp from 'jimp';
 
 /* eslint-disable camelcase */
 type Screenshot = {
@@ -243,20 +242,7 @@ export class ScreenshotDiffReporter implements Reporter {
       throw new TypeError('Could not find reference image in S3 bucket');
     }
 
-    const [
-      { bitmap: { width: refWidth, height: refHeight } },
-      { bitmap: { width: newWidth, height: newHeight } },
-    ] = await bluebird.map([referenceImage, newImage], async imageBuffer =>
-      jimp.read(imageBuffer),
-    );
-
-    const diff = pixelmatch(
-      referenceImage,
-      newImage,
-      null,
-      Math.min(refWidth, newWidth),
-      Math.min(refHeight, newHeight),
-    );
+    const diff = pixelmatch(referenceImage, newImage, null, 1024, 1644);
 
     return {
       testName: `Screenshot Diff (${screenshotId})`,
