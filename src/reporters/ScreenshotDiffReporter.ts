@@ -5,36 +5,58 @@ import pixelmatch from 'pixelmatch';
 import bluebird from 'bluebird';
 import { S3 } from 'aws-sdk';
 import { GlobalConfig } from '../config';
-import { URL } from 'url';
+import jimp from 'jimp';
 
 /* eslint-disable camelcase */
-type ScreenshotResponseBody = {
+type Screenshot = {
+  id: string;
+  os: string;
+  os_version: string;
+  browser: string;
+  browser_version: string;
+  url: string;
+  orientation: 'portrait' | 'landscape' | null;
+} & (
+  | {
+      state: 'done';
+      thumb_url: string;
+      image_url: string;
+      created_at: string;
+    }
+  | {
+      state: 'pending';
+    });
+
+type PostScreenshotResponse = {
   job_id: string;
-  state: 'done';
-  callback_url?: string;
+  state: 'done' | 'pending';
+  callback_url: string | null;
   win_res: string;
   mac_res: string;
-  quality: 'compressed' | 'original';
+  quality: string;
   wait_time: number;
-  screenshots: Array<{
-    id: string;
-    os: string;
-    os_version: string;
-    browser: string;
-    browser_version: string;
-    url: string;
-  }> &
-    (
-      | {
-          state: 'done';
-          thumb_url: string;
-          image_url: string;
-          created_at: string;
-        }
-      | {
-          state: 'pending';
-        });
+  orientation: string;
+  screenshots: Screenshot[];
 };
+
+type GetJobResponse = {
+  id: string;
+} & {
+  [K in Exclude<
+    keyof PostScreenshotResponse,
+    'job_id'
+  >]: PostScreenshotResponse[K]
+};
+
+type Browser = {
+  os: string;
+  os_version: string;
+  browser: string;
+  device?: string | null;
+  browser_version?: string | null;
+  real_mobile?: boolean | null;
+};
+
 /* eslint-enable camelcase */
 
 export class ScreenshotDiffReporter implements Reporter {
@@ -44,25 +66,40 @@ export class ScreenshotDiffReporter implements Reporter {
     async ({
       url,
       username,
-      password,
+      apiKey,
+      browsers,
     }: {
       url: string;
       username: string;
-      password: string;
-    }): Promise<GotPromise<ScreenshotResponseBody>> =>
-      got.post(ScreenshotDiffReporter.API_ENDPOINT, {
-        auth: `${username}:${password}`,
+      apiKey: string;
+      browsers: Browser[];
+    }): Promise<string> => {
+      const { body } = await got.post(ScreenshotDiffReporter.API_ENDPOINT, {
+        auth: `${username}:${apiKey}`,
         body: {
           url,
-          browsers: [
-            {
-              browser: 'chrome',
-              browser_version: '41.0',
-              os: 'Windows',
-              os_version: '10',
-            },
-          ],
+          browsers,
         },
+        json: true,
+      });
+
+      return (body as PostScreenshotResponse).job_id;
+    },
+    1000,
+  );
+
+  private static getScreenshotsJob = debouncePromise(
+    async ({
+      jobId,
+      username,
+      apiKey,
+    }: {
+      jobId: string;
+      username: string;
+      apiKey: string;
+    }): Promise<GotPromise<GetJobResponse>> =>
+      got(`${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`, {
+        auth: `${username}:${apiKey}`,
         json: true,
       }),
     1000,
@@ -93,107 +130,132 @@ export class ScreenshotDiffReporter implements Reporter {
     this.username = config.browserstack.username;
   }
 
-  private static getScreenshotUrl = async ({
-    jobId,
-    username,
-    password,
+  private static waitForScreenshots = async ({
+    pollInterval = 500,
+    maxNumAttempts = 5,
+    ...restOptions
   }: {
+    pollInterval?: number;
+    maxNumAttempts?: number;
     username: string;
-    password: string;
+    apiKey: string;
     jobId: string;
   }) => {
-    const { body } = await got(
-      `${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`,
-      {
-        auth: `${username}:${password}`,
-        json: true,
-      },
-    );
+    let numAttempts = 0;
 
-    if (body.state === 'done') {
-      return body.screenshots[0].image_url;
-    }
-
-    return undefined;
-  };
-
-  private static waitForScreenshotUrl = async (options: {
-    username: string;
-    password: string;
-    jobId: string;
-  }) => {
-    let url: string | undefined;
-
-    while (url === undefined) {
-      url = await ScreenshotDiffReporter.getScreenshotUrl(options);
-      if (!url) {
-        await bluebird.delay(500);
+    /* eslint-disable no-await-in-loop */
+    while (numAttempts < maxNumAttempts) {
+      const { body } = await ScreenshotDiffReporter.getScreenshotsJob(
+        restOptions,
+      );
+      if (body.state === 'done') {
+        const { screenshots } = body;
+        if (screenshots.every(screenshot => screenshot.state === 'done')) {
+          return screenshots;
+        }
       }
-    }
 
-    return url;
+      numAttempts += 1;
+      await bluebird.delay(pollInterval);
+    }
+    /* eslint-enable no-await-in-loop */
+
+    return [];
   };
 
   async getReports(): Promise<Report[]> {
-    const { body } = await ScreenshotDiffReporter.startScreenshotJobs({
+    const jobId = await ScreenshotDiffReporter.startScreenshotJobs({
       url: this.url,
-      password: this.apiKey,
+      apiKey: this.apiKey,
       username: this.username,
+      browsers: [
+        {
+          browser: 'chrome',
+          browser_version: '41.0',
+          os: 'Windows',
+          os_version: '10',
+        },
+      ],
     });
 
-    const jobId = body.job_id;
-
-    const url = await ScreenshotDiffReporter.waitForScreenshotUrl({
+    const screenshots = await ScreenshotDiffReporter.waitForScreenshots({
       jobId,
-      password: this.apiKey,
+      apiKey: this.apiKey,
       username: this.username,
     });
 
-    const newImagePromise = got(url, { encoding: null }).then(
-      async res => res.body,
-    );
+    return bluebird.map(screenshots, async screenshot => {
+      if (screenshot.state !== 'done') {
+        throw new TypeError('Could not get screenshot URL');
+      }
 
-    const { pathname, hostname } = new URL(this.url);
-    const s3ImageKey = `screenshots/${hostname}/${pathname}/referenceScreenshot.png`;
+      const newImagePromise = got(screenshot.image_url, {
+        encoding: null,
+      }).then(async res => res.body);
 
-    const referenceImagePromise = this.s3
-      .getObject({
-        Bucket: this.bucketName,
-        Key: s3ImageKey,
-      })
-      .promise()
-      .then(res => res.Body)
-      .catch(() => undefined);
+      const {
+        url,
+        browser,
+        os,
+        os_version: osVersion,
+        browser_version: browserVersion,
+      } = screenshot;
+      const normalizedUrl = url.replace(/^https?:\/\//, '');
 
-    const [newImage, referenceImage] = await Promise.all([
-      newImagePromise,
-      referenceImagePromise,
-    ]);
+      const screenshotId = `${browser} ${browserVersion} on ${os} ${osVersion}`;
 
-    await this.s3
-      .putObject({
-        Bucket: this.bucketName,
-        Key: s3ImageKey,
-        Body: newImage,
-      })
-      .promise();
+      const s3ImageKey = `screenshots/${normalizedUrl}/${screenshotId}/referenceScreenshot.png`;
 
-    if (!referenceImage || !(referenceImage instanceof Buffer)) {
-      throw new TypeError('Could not find reference image');
-    }
+      const referenceImagePromise = this.s3
+        .getObject({
+          Bucket: this.bucketName,
+          Key: s3ImageKey,
+        })
+        .promise()
+        .then(res => res.Body)
+        .catch(() => undefined);
 
-    const diff = pixelmatch(referenceImage, newImage, null, 1024, 1644);
+      const [newImage, referenceImage] = await Promise.all([
+        newImagePromise,
+        referenceImagePromise,
+      ]);
 
-    return [
-      {
-        testName: 'Screenshot Diff',
+      await this.s3
+        .putObject({
+          Bucket: this.bucketName,
+          Key: s3ImageKey,
+          Body: newImage,
+        })
+        .promise();
+
+      if (!referenceImage || !(referenceImage instanceof Buffer)) {
+        throw new TypeError('Could not find reference image in S3 bucket');
+      }
+
+      const [
+        { bitmap: { width: refWidth, height: refHeight } },
+        { bitmap: { width: newWidth, height: newHeight } },
+      ] = await bluebird.map([referenceImage, newImage], async imageBuffer =>
+        jimp.read(imageBuffer),
+      );
+
+      const diff = pixelmatch(
+        referenceImage,
+        newImage,
+        null,
+        Math.min(refWidth, newWidth),
+        Math.min(refHeight, newHeight),
+      );
+
+      return {
+        testName: `Screenshot Diff (${screenshotId})`,
         records: [
           {
             id: 'diff',
             value: diff,
           },
         ],
-      },
-    ];
+      };
+    });
   }
 }
