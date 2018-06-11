@@ -5,10 +5,11 @@ import pixelmatch from 'pixelmatch';
 import bluebird from 'bluebird';
 import { S3 } from 'aws-sdk';
 import { GlobalConfig } from '../config';
+import { URL } from 'url';
 
 /* eslint-disable camelcase */
 type ScreenshotResponseBody = {
-  id: string;
+  job_id: string;
   state: 'done';
   callback_url?: string;
   win_res: string;
@@ -53,11 +54,14 @@ export class ScreenshotDiffReporter implements Reporter {
         auth: `${username}:${password}`,
         body: {
           url,
-          browser: 'chrome',
-          browser_version: '41',
-          os: 'Windows',
-          os_version: '10',
-          device: null,
+          browsers: [
+            {
+              browser: 'chrome',
+              browser_version: '41.0',
+              os: 'Windows',
+              os_version: '10',
+            },
+          ],
         },
         json: true,
       }),
@@ -134,9 +138,9 @@ export class ScreenshotDiffReporter implements Reporter {
       username: this.username,
     });
 
-    const jobId = body.id;
+    const jobId = body.job_id;
 
-    const timeOut = bluebird.delay(3000).then(() => {
+    const timeOut = bluebird.delay(30000).then(() => {
       throw new TypeError('Screenshot reporter timed out');
     });
 
@@ -149,7 +153,8 @@ export class ScreenshotDiffReporter implements Reporter {
         async res => res.body,
       );
 
-      const s3ImageKey = `screenshots/${url}/referenceScreenshot.png`;
+      const { pathname, hostname } = new URL(this.url);
+      const s3ImageKey = `screenshots/${hostname}/${pathname}/referenceScreenshot.png`;
 
       const referenceImagePromise = this.s3
         .getObject({
@@ -157,7 +162,8 @@ export class ScreenshotDiffReporter implements Reporter {
           Key: s3ImageKey,
         })
         .promise()
-        .then(res => res.Body);
+        .then(res => res.Body)
+        .catch(() => undefined);
 
       const [newImage, referenceImage] = await Promise.all([
         newImagePromise,
@@ -180,8 +186,8 @@ export class ScreenshotDiffReporter implements Reporter {
         referenceImage,
         newImage,
         Buffer.alloc(0),
-        1020,
-        691,
+        1024,
+        1644,
       );
 
       return [
