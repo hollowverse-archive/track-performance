@@ -34,7 +34,7 @@ provider:
         - "${self:custom.secretsArnPrefix}/wpt/apiKey-*"
         - "${self:custom.secretsArnPrefix}/google/searchConsoleApis/apiKey-*"
         - "${self:custom.secretsArnPrefix}/splunk/httpCollector/perfReports/token-*"
-        - "${self:custom.secretsArnPrefix}/browserstack/apiKey-*"
+        - "${self:custom.secretsArnPrefix}/browserStack/token-*"
     - Effect: Allow
       Action:
         - s3:*
