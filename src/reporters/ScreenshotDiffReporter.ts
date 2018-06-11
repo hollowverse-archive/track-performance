@@ -24,12 +24,12 @@ type Screenshot = {
       created_at: string;
     }
   | {
-      state: 'pending';
+      state: 'processing';
     });
 
 type PostScreenshotResponse = {
   job_id: string;
-  state: 'done' | 'pending';
+  state: 'done' | 'queued_all';
   callback_url: string | null;
   win_res: string;
   mac_res: string;
@@ -66,16 +66,16 @@ export class ScreenshotDiffReporter implements Reporter {
     async ({
       url,
       username,
-      apiKey,
+      token,
       browsers,
     }: {
       url: string;
       username: string;
-      apiKey: string;
+      token: string;
       browsers: Browser[];
     }): Promise<string> => {
       const { body } = await got.post(ScreenshotDiffReporter.API_ENDPOINT, {
-        auth: `${username}:${apiKey}`,
+        auth: `${username}:${token}`,
         body: {
           url,
           browsers,
@@ -85,60 +85,60 @@ export class ScreenshotDiffReporter implements Reporter {
 
       return (body as PostScreenshotResponse).job_id;
     },
-    1000,
+    200,
   );
 
   private static getScreenshotsJob = debouncePromise(
     async ({
       jobId,
       username,
-      apiKey,
+      token,
     }: {
       jobId: string;
       username: string;
-      apiKey: string;
+      token: string;
     }): Promise<GotPromise<GetJobResponse>> =>
       got(`${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`, {
-        auth: `${username}:${apiKey}`,
+        auth: `${username}:${token}`,
         json: true,
       }),
-    1000,
+    200,
   );
 
   private url: string;
   private bucketName: string;
   private username: string;
-  private apiKey: string;
+  private token: string;
   private s3 = new S3();
 
-  constructor(url: string, config?: Pick<GlobalConfig, 'browserstack'>) {
+  constructor(url: string, config?: Pick<GlobalConfig, 'browserStack'>) {
     this.url = url;
 
     if (
       !config ||
-      !config.browserstack.apiKey ||
-      !config.browserstack.username ||
-      !config.browserstack.screenshotsBucket
+      !config.browserStack.token ||
+      !config.browserStack.username ||
+      !config.browserStack.screenshotsBucket
     ) {
       throw new TypeError(
         'Invalid configuration provided to ScreenshotDiffReporter constructor',
       );
     }
 
-    this.bucketName = config.browserstack.screenshotsBucket;
-    this.apiKey = config.browserstack.apiKey;
-    this.username = config.browserstack.username;
+    this.bucketName = config.browserStack.screenshotsBucket;
+    this.token = config.browserStack.token;
+    this.username = config.browserStack.username;
   }
 
   private static waitForScreenshots = async ({
-    pollIntervalMilliseconds = 500,
-    maxNumAttempts = 5,
+    pollIntervalMilliseconds = 1000,
+    maxNumAttempts = 3,
     ...restOptions
   }: {
     pollIntervalMilliseconds?: number;
     maxNumAttempts?: number;
     username: string;
-    apiKey: string;
+    token: string;
     jobId: string;
   }) => {
     let numAttempts = 0;
@@ -148,6 +148,7 @@ export class ScreenshotDiffReporter implements Reporter {
       const { body } = await ScreenshotDiffReporter.getScreenshotsJob(
         restOptions,
       );
+
       if (body.state === 'done') {
         const { screenshots } = body;
         if (screenshots.every(screenshot => screenshot.state === 'done')) {
@@ -166,7 +167,7 @@ export class ScreenshotDiffReporter implements Reporter {
   async getReports(): Promise<Report[]> {
     const jobId = await ScreenshotDiffReporter.startScreenshotsJob({
       url: this.url,
-      apiKey: this.apiKey,
+      token: this.token,
       username: this.username,
       browsers: [
         {
@@ -180,9 +181,15 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const screenshots = await ScreenshotDiffReporter.waitForScreenshots({
       jobId,
-      apiKey: this.apiKey,
+      token: this.token,
       username: this.username,
     });
+
+    if (screenshots.length === 0) {
+      throw new Error(
+        'No screenshots were returned from BrowserStack API call',
+      );
+    }
 
     return bluebird.map(screenshots, this.screenshotToDiffReport);
   }
@@ -205,10 +212,9 @@ export class ScreenshotDiffReporter implements Reporter {
       os_version: osVersion,
       browser_version: browserVersion,
     } = screenshot;
+
     const normalizedUrl = url.replace(/^https?:\/\//, '');
-
     const screenshotId = `${browser} ${browserVersion} on ${os} ${osVersion}`;
-
     const s3ImageKey = `screenshots/${normalizedUrl}/${screenshotId}/referenceScreenshot.png`;
 
     const referenceImagePromise = this.s3
