@@ -22,7 +22,7 @@ type Screenshot = {
       created_at: string;
     }
   | {
-      state: 'processing';
+      state: 'processing' | 'timed-out';
     });
 
 type PostScreenshotResponse = {
@@ -86,40 +86,40 @@ export class ScreenshotDiffReporter implements Reporter {
   }
 
   private static startScreenshotsJob = async ({
-      url,
-      username,
-      token,
-      browsers,
-    }: {
-      url: string;
-      username: string;
-      token: string;
-      browsers: Browser[];
-    }): Promise<string> => {
-      const { body } = await got.post(ScreenshotDiffReporter.API_ENDPOINT, {
-        auth: `${username}:${token}`,
-        body: {
-          url,
-          browsers,
-        },
-        json: true,
-      });
+    url,
+    username,
+    token,
+    browsers,
+  }: {
+    url: string;
+    username: string;
+    token: string;
+    browsers: Browser[];
+  }): Promise<string> => {
+    const { body } = await got.post(ScreenshotDiffReporter.API_ENDPOINT, {
+      auth: `${username}:${token}`,
+      body: {
+        url,
+        browsers,
+      },
+      json: true,
+    });
 
-      return (body as PostScreenshotResponse).job_id;
+    return (body as PostScreenshotResponse).job_id;
   };
 
   private static getScreenshotsJob = async ({
-      jobId,
-      username,
-      token,
-    }: {
-      jobId: string;
-      username: string;
-      token: string;
-    }): Promise<GotPromise<GetJobResponse>> =>
-      got(`${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`, {
-        auth: `${username}:${token}`,
-        json: true,
+    jobId,
+    username,
+    token,
+  }: {
+    jobId: string;
+    username: string;
+    token: string;
+  }): Promise<GotPromise<GetJobResponse>> =>
+    got(`${ScreenshotDiffReporter.API_ENDPOINT}/${jobId}.json`, {
+      auth: `${username}:${token}`,
+      json: true,
     });
 
   private static waitForScreenshots = async ({
@@ -143,6 +143,10 @@ export class ScreenshotDiffReporter implements Reporter {
 
       if (body.state === 'done') {
         const { screenshots } = body;
+        if (screenshots.some(screenshot => screenshot.state === 'timed-out')) {
+          return [];
+        }
+
         if (screenshots.every(screenshot => screenshot.state === 'done')) {
           return screenshots;
         }
