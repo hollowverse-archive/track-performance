@@ -817,9 +817,9 @@
   version "8.10.17"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.17.tgz#d48cf10f0dc6dcf59f827f5a3fc7a4a6004318d3"
 
-"@types/p-debounce@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/p-debounce/-/p-debounce-1.0.0.tgz#c7fab3d61f9bc6454337c4aef0dec069456d00ee"
+"@types/p-throttle@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@types/p-throttle/-/p-throttle-1.1.0.tgz#376e3e377f485b310269d4fa704613c7b7aa9c15"
 
 "@types/prettier@^1.10.0":
   version "1.10.0"
@@ -6245,10 +6245,6 @@ p-cancelable@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-0.4.0.tgz#bcb41d35bf6097fc4367a065b6eb84b9b124eff0"
 
-p-debounce@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/p-debounce/-/p-debounce-1.0.0.tgz#cb7f2cbeefd87a09eba861e112b67527e621e2fd"
-
 p-each-series@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-each-series/-/p-each-series-1.0.0.tgz#930f3d12dd1f50e7434457a22cd6f04ac6ad7f71"
@@ -6286,6 +6282,10 @@ p-map@^1.1.1:
 p-reduce@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-reduce/-/p-reduce-1.0.0.tgz#18c2b0dd936a4690a529f8231f58a0fdb6a47dfa"
+
+p-throttle@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/p-throttle/-/p-throttle-1.1.0.tgz#dd0822247ffc7767a8c7bb1186fcc632fea57075"
 
 p-timeout@^1.1.1:
   version "1.2.1"
