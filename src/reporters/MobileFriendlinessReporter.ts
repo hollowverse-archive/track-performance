@@ -2,7 +2,7 @@ import got from 'got';
 import { Reporter, Report } from '../typings/reporter';
 import { find } from 'lodash';
 import { GlobalConfig } from '../config';
-import debouncePromise from 'p-debounce';
+import pThrottle from 'p-throttle';
 
 type Rule =
   | 'USES_INCOMPATIBLE_PLUGINS'
@@ -59,7 +59,7 @@ type GoogleMobileFriendlinessTestResponse = {
 export class MobileFriendlinessReporter implements Reporter {
   private static API_ENDPOINT = 'https://searchconsole.googleapis.com/v1/urlTestingTools/mobileFriendlyTest:run';
 
-  private static getApiResponse = debouncePromise(
+  private static getApiResponse = pThrottle(
     async ({ url, key }: { url: string; key: string }) =>
       got.post(MobileFriendlinessReporter.API_ENDPOINT, {
         json: true,
@@ -71,6 +71,7 @@ export class MobileFriendlinessReporter implements Reporter {
           requestScreenshot: false,
         },
       }),
+    1,
     200,
   );
 

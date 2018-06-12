@@ -1,12 +1,12 @@
 import got from 'got';
 import { Reporter, Report } from '../typings/reporter';
-import debouncePromise from 'p-debounce';
 import { oneLine } from 'common-tags';
+import pThrottle from 'p-throttle';
 
 export class SecurityHeadersReporter implements Reporter {
   private static API_ENDPOINT = 'https://securityheaders.com/';
 
-  private static getApiResponse = debouncePromise(
+  private static getApiResponse = pThrottle(
     async ({ url }: { url: string }) =>
       got.head(SecurityHeadersReporter.API_ENDPOINT, {
         query: {
@@ -15,6 +15,7 @@ export class SecurityHeadersReporter implements Reporter {
         },
         followRedirect: true,
       }),
+    1,
     1000,
   );
 
