@@ -4,6 +4,7 @@ import pixelmatch from 'pixelmatch';
 import bluebird from 'bluebird';
 import { S3 } from 'aws-sdk';
 import { GlobalConfig } from '../config';
+import { URL } from 'url';
 
 /* eslint-disable camelcase */
 type Screenshot = {
@@ -211,7 +212,7 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const normalizedUrl = url.replace(/^https?:\/\//, '');
     const screenshotId = `${browser} ${browserVersion} on ${os} ${osVersion}`;
-    const s3ImageKey = `screenshots/${normalizedUrl}/${screenshotId}/referenceScreenshot.png`;
+    const s3ImageKey = `screenshots/${normalizedUrl}/${screenshotId}/mostRecent.png`;
 
     const referenceImagePromise = this.s3
       .getObject({
@@ -232,6 +233,8 @@ export class ScreenshotDiffReporter implements Reporter {
         Bucket: this.bucketName,
         Key: s3ImageKey,
         Body: newImage,
+        ACL: 'public-read',
+        ContentType: 'image/png',
       })
       .promise();
 
@@ -241,12 +244,22 @@ export class ScreenshotDiffReporter implements Reporter {
 
     const diff = pixelmatch(referenceImage, newImage, null, 1024, 1644);
 
+    const s3ImageUrl = new URL(
+      'https://s3.amazonaws.com/',
+      `${this.bucketName}/${s3ImageKey}`,
+    ).toString();
+
     return {
-      testName: `Screenshot Diff (${screenshotId})`,
+      testName: `Screenshot (${screenshotId})`,
       records: [
+        {
+          id: 'url',
+          value: s3ImageUrl,
+        },
         {
           id: 'diff',
           value: diff,
+          description: 'Pixel diff with the previous most recent screenshot',
         },
       ],
     };
