@@ -245,8 +245,8 @@ export class ScreenshotDiffReporter implements Reporter {
     const diff = pixelmatch(referenceImage, newImage, null, 1024, 1644);
 
     const s3ImageUrl = new URL(
-      'https://s3.amazonaws.com/',
       `${this.bucketName}/${s3ImageKey}`,
+      'https://s3.amazonaws.com/',
     ).toString();
 
     return {
