@@ -1,4 +1,4 @@
-import { readAwsSecretsForStage } from '@hollowverse/utils/helpers/readAwsSecretsForStage';
+import { readAwsSecretsForStage } from '@hollowverse/utils/helpers/readAwsSecretStringsForStage';
 
 export const getConfig = async () => {
   const secrets = await readAwsSecretsForStage([

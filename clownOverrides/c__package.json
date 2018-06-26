@@ -3,8 +3,5 @@
     "check-ts": "run-p 'check-ts/*'",
     "pre-push": "yarn test",
     "pre-commit": "yarn pretest"
-  },
-  "dependencies": {
-    "@hollowverse/utils": "^6.1.0"
   }
 }

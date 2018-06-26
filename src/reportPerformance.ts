@@ -2,9 +2,9 @@ import bluebird from 'bluebird';
 import { collectReports } from './helpers/collectReports';
 import { getConfig } from './config';
 import { format as formatDate } from 'date-fns';
-import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
-import { WebPageTestReporter } from './reporters/WebPageTestReporter';
-import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
+// import { SecurityHeadersReporter } from './reporters/SecurityHeadersReporter';
+// import { WebPageTestReporter } from './reporters/WebPageTestReporter';
+// import { MobileFriendlinessReporter } from './reporters/MobileFriendlinessReporter';
 import { ReporterClass } from './typings/reporter';
 import { SplunkLogger } from './helpers/splunkLogger';
 import { ScreenshotDiffReporter } from './reporters/ScreenshotDiffReporter';
@@ -26,9 +26,9 @@ export const reportPerformance = async () => {
 
   const pageReporters: ReporterClass[] = [
     ScreenshotDiffReporter,
-    SecurityHeadersReporter,
-    MobileFriendlinessReporter,
-    WebPageTestReporter,
+    // SecurityHeadersReporter,
+    // MobileFriendlinessReporter,
+    // WebPageTestReporter,
   ];
 
   const pageReports = await bluebird.map(urls, async url => ({
