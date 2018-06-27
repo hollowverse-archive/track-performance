@@ -1,7 +1,7 @@
-import { readAwsSecretsForStage } from '@hollowverse/utils/helpers/readAwsSecretStringsForStage';
+import { readAwsSecretStringsForStage } from '@hollowverse/utils/helpers/readAwsSecretStringsForStage';
 
 export const getConfig = async () => {
-  const secrets = await readAwsSecretsForStage([
+  const secrets = await readAwsSecretStringsForStage([
     'wpt/apiKey',
     'google/searchConsoleApis/apiKey',
     'splunk/httpCollector/perfReports/token',
